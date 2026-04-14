@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – User Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+
+        /* ── Page layout ── */
+        .um-content {
+            flex: 1;
+            padding: 35px 30px;
+            background: #f4f6f9;
+            overflow-y: auto;
+        }
+
+        /* ── Page header ── */
+        .um-header {
+            margin-bottom: 28px;
+        }
+
+        .um-header h1 {
+            font-size: 1.75em;
+            color: #1f2d3d;
+            margin-bottom: 4px;
+        }
+
+        .um-header p {
+            color: #6c757d;
+            font-size: 0.95em;
+        }
+
+        /* ── Summary stat cards ── */
+        .um-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .um-stat {
+            background: white;
+            padding: 18px 16px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+            text-align: center;
+            border-top: 4px solid #ccc;
+            transition: transform 0.2s;
+        }
+
+        .um-stat:hover { transform: translateY(-3px); }
+
+        .um-stat.all      { border-top-color: #007BFF; }
+        .um-stat.admin    { border-top-color: #dc3545; }
+        .um-stat.doctor   { border-top-color: #28a745; }
+        .um-stat.pharma   { border-top-color: #fd7e14; }
+        .um-stat.patient  { border-top-color: #6f42c1; }
+
+        .um-stat .s-icon  { font-size: 1.6em; margin-bottom: 6px; }
+
+        .um-stat h3 {
+            font-size: 0.75em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .um-stat p {
+            font-size: 1.8em;
+            font-weight: 800;
+            color: #1f2d3d;
+            margin: 0;
+        }
+
+        /* ── Toolbar ── */
+        .um-toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .um-toolbar input,
+        .um-toolbar select {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.91em;
+            outline: none;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .um-toolbar input { width: 260px; }
+
+        .um-toolbar input:focus,
+        .um-toolbar select:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .um-count {
+            margin-left: auto;
+            font-size: 0.85em;
+            color: #888;
+            font-weight: 600;
+        }
+
+        /* ── Table card ── */
+        .um-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .um-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .um-table thead tr {
+            background: #1f2d3d;
+            color: white;
+        }
+
+        .um-table th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+        }
+
+        .um-table td {
+            padding: 14px 18px;
+            font-size: 0.92em;
+            color: #333;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: middle;
+        }
+
+        .um-table tbody tr:last-child td { border-bottom: none; }
+
+        .um-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .um-table tbody tr:hover { background: #f7faff; }
+
+        /* ── User cell with avatar ── */
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Avatar colours per role */
+        .avatar.admin      { background: linear-gradient(135deg, #dc3545, #ff6b81); }
+        .avatar.doctor     { background: linear-gradient(135deg, #28a745, #5cd65c); }
+        .avatar.pharmacist { background: linear-gradient(135deg, #fd7e14, #ffb347); }
+        .avatar.patient    { background: linear-gradient(135deg, #6f42c1, #a78bfa); }
+        .avatar.default    { background: linear-gradient(135deg, #007BFF, #00c6ff); }
+
+        .user-info .user-name {
+            font-weight: 600;
+            color: #1f2d3d;
+            display: block;
+        }
+
+        /* ── Email ── */
+        .email-cell {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        /* ── Date chip ── */
+        .date-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.82em;
+            font-weight: 600;
+            background: #f0f2f5;
+            color: #555;
+        }
+
+        /* ── Role badges ── */
+        .role-badge {
+            display: inline-block;
+            padding: 5px 13px;
+            border-radius: 20px;
+            font-size: 0.78em;
+            font-weight: 700;
+            text-transform: capitalize;
+            letter-spacing: 0.3px;
+        }
+
+        .role-badge.admin      { background: #fde8ea; color: #c0392b; }
+        .role-badge.doctor     { background: #d4edda; color: #155724; }
+        .role-badge.pharmacist { background: #fff3e0; color: #e65100; }
+        .role-badge.patient    { background: #ede7fd; color: #5b21b6; }
+
+        /* ── Delete button ── */
+        .del-btn {
+            padding: 7px 16px;
+            background: white;
+            color: #dc3545;
+            border: 1.5px solid #dc3545;
+            border-radius: 8px;
+            font-size: 0.83em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+        }
+
+        .del-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.91em;
+            color: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 9999;
+        }
+
+        .toast.show        { transform: translateY(0); opacity: 1; }
+        .toast.success     { background: #28a745; }
+        .toast.error       { background: #dc3545; }
+
+        /* ── Delete confirm modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            padding: 35px 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: popIn 0.25s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+
+        .modal-box .modal-icon { font-size: 2.8em; margin-bottom: 12px; }
+
+        .modal-box h3 {
+            font-size: 1.15em;
+            color: #1f2d3d;
+            margin-bottom: 8px;
+        }
+
+        .modal-box p {
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-cancel {
+            padding: 10px 24px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            color: #555;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-cancel:hover { background: #f4f6f9; }
+
+        .modal-confirm {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #dc3545;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .modal-confirm:hover { background: #a71d2a; transform: scale(1.04); }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state .empty-icon { font-size: 3em; margin-bottom: 12px; }
+        .empty-state p { font-size: 1em; font-weight: 600; color: #888; margin-bottom: 4px; }
+        .empty-state small { font-size: 0.85em; color: #aaa; }
+
+        @media (max-width: 768px) {
+            .um-content { padding: 20px 15px; }
+            .um-toolbar input { width: 100%; }
+            .um-count { margin-left: 0; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">Admin Dashboard</h2>
+        <a href="{{ url_for('admin_dashboard') }}">🏠 Dashboard</a>
+        <a href="{{ url_for('admin_appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('admin_users') }}">👥 Users</a>
+        <a href="{{ url_for('admin_create_user') }}">➕ Create Users</a>
+        <a href="{{ url_for('admin_billing') }}">💳 Billing</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="um-content">
+
+        <!-- Header -->
+        <div class="um-header">
+            <h1>👥 User Management</h1>
+            <p>View, filter, and manage all registered users in the system.</p>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="um-stats">
+            <div class="um-stat all">
+                <div class="s-icon">👤</div>
+                <h3>Total Users</h3>
+                <p id="countAll">{{ users | length }}</p>
+            </div>
+            <div class="um-stat admin">
+                <div class="s-icon">🛡️</div>
+                <h3>Admins</h3>
+                <p>{{ users | selectattr('role', 'equalto', 'admin') | list | length }}</p>
+            </div>
+            <div class="um-stat doctor">
+                <div class="s-icon">🩺</div>
+                <h3>Doctors</h3>
+                <p>{{ users | selectattr('role', 'equalto', 'doctor') | list | length }}</p>
+            </div>
+            <div class="um-stat pharma">
+                <div class="s-icon">💊</div>
+                <h3>Pharmacists</h3>
+                <p>{{ users | selectattr('role', 'equalto', 'pharmacist') | list | length }}</p>
+            </div>
+            <div class="um-stat patient">
+                <div class="s-icon">🧑‍⚕️</div>
+                <h3>Patients</h3>
+                <p>{{ users | selectattr('role', 'equalto', 'patient') | list | length }}</p>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="um-toolbar">
+            <input type="text" id="searchUser" placeholder="🔍  Search by name or email…">
+            <select id="roleFilter">
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="doctor">Doctor</option>
+                <option value="pharmacist">Pharmacist</option>
+                <option value="patient">Patient</option>
+            </select>
+            <span class="um-count" id="visibleCount"></span>
+        </div>
+
+        <!-- Table Card -->
+        <div class="um-card">
+            <table class="um-table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr data-user-id="{{ user.user_id }}" data-role="{{ user.role }}">
+
+                        <!-- Row number -->
+                        <td style="color:#bbb; font-size:0.85em; font-weight:600;">
+                            {{ loop.index }}
+                        </td>
+
+                        <!-- User avatar + name -->
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar {{ user.role }}">
+                                    {{ user.full_name[:2] | upper }}
+                                </div>
+                                <div class="user-info">
+                                    <span class="user-name">{{ user.full_name }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Email -->
+                        <td class="email-cell">{{ user.email }}</td>
+
+                        <!-- Date joined -->
+                        <td>
+                            <span class="date-chip">
+                                {{ user.created_at.strftime('%d %b %Y') }}
+                            </span>
+                        </td>
+
+                        <!-- Role badge -->
+                        <td>
+                            <span class="role-badge {{ user.role }}">
+                                {{ user.role }}
+                            </span>
+                        </td>
+
+                        <!-- Delete -->
+                        <td>
+                            <button class="del-btn"
+                                    data-user-id="{{ user.user_id }}"
+                                    data-user-name="{{ user.full_name }}">
+                                🗑 Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon">👥</div>
+                                <p>No users found</p>
+                                <small>Registered users will appear here.</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div><!-- end um-content -->
+</div><!-- end dashboard-wrapper -->
+
+<!-- ── Delete Confirm Modal ── -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-icon">⚠️</div>
+        <h3>Delete User?</h3>
+        <p id="modalMsg">This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button class="modal-cancel" id="modalCancel">Cancel</button>
+            <button class="modal-confirm" id="modalConfirm">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── Toast helper ── */
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3200);
+}
+
+/* ── Filter logic ── */
+const searchInput  = document.getElementById('searchUser');
+const roleSelect   = document.getElementById('roleFilter');
+const countEl      = document.getElementById('visibleCount');
+const allRows      = document.querySelectorAll('#userTable tbody tr[data-user-id]');
+
+function filterTable() {
+    const q    = searchInput.value.toLowerCase();
+    const role = roleSelect.value.toLowerCase();
+    let visible = 0;
+
+    allRows.forEach(row => {
+        const name  = row.querySelector('.user-name')?.textContent.toLowerCase() || '';
+        const email = row.querySelector('.email-cell')?.textContent.toLowerCase() || '';
+        const rRole = row.dataset.role?.toLowerCase() || '';
+
+        const matchText = name.includes(q) || email.includes(q);
+        const matchRole = !role || rRole === role;
+        const show = matchText && matchRole;
+
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    countEl.textContent = `${visible} user${visible !== 1 ? 's' : ''} shown`;
+}
+
+searchInput.addEventListener('input', filterTable);
+roleSelect.addEventListener('change', filterTable);
+filterTable(); // run once on load
+
+/* ── Modal delete logic ── */
+let pendingUserId  = null;
+let pendingRow     = null;
+
+const modal        = document.getElementById('deleteModal');
+const modalMsg     = document.getElementById('modalMsg');
+const modalCancel  = document.getElementById('modalCancel');
+const modalConfirm = document.getElementById('modalConfirm');
+
+document.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        pendingUserId = this.dataset.userId;
+        pendingRow    = this.closest('tr');
+        const name    = this.dataset.userName;
+        modalMsg.textContent = `Are you sure you want to delete "${name}"? This cannot be undone.`;
+        modal.classList.add('open');
+    });
+});
+
+modalCancel.addEventListener('click', () => {
+    modal.classList.remove('open');
+    pendingUserId = null;
+    pendingRow    = null;
+});
+
+/* Close modal when clicking outside the box */
+modal.addEventListener('click', function (e) {
+    if (e.target === modal) {
+        modal.classList.remove('open');
+        pendingUserId = null;
+        pendingRow    = null;
+    }
+});
+
+modalConfirm.addEventListener('click', function () {
+    if (!pendingUserId) return;
+
+    modal.classList.remove('open');
+
+    fetch(`/admin/delete_user/${pendingUserId}`, { method: 'POST' })
+        .then(response => {
+            if (response.ok) {
+                pendingRow.style.transition = 'opacity 0.3s';
+                pendingRow.style.opacity = '0';
+                setTimeout(() => {
+                    pendingRow.remove();
+                    filterTable();  // recount after removal
+                }, 300);
+                showToast('User deleted successfully ✔', 'success');
+            } else {
+                showToast('Failed to delete user.', 'error');
+            }
+        })
+        .catch(() => showToast('Network error. Try again.', 'error'))
+        .finally(() => {
+            pendingUserId = null;
+            pendingRow    = null;
+        });
+});
+</script>
+</body>
+</html>

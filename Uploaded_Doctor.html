@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacist – Doctor Prescriptions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+
+        .doc-content {
+            flex: 1;
+            padding: 35px 30px;
+            background: #f4f6f9;
+            overflow-y: auto;
+        }
+
+        .doc-header { margin-bottom: 28px; }
+        .doc-header h1 { font-size: 1.75em; color: #1f2d3d; margin-bottom: 4px; }
+        .doc-header p  { color: #6c757d; font-size: 0.95em; }
+
+        /* ── Stat cards ── */
+        .doc-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .doc-stat {
+            background: white; padding: 18px 16px;
+            border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+            text-align: center; border-top: 4px solid #ccc; transition: transform 0.2s;
+        }
+
+        .doc-stat:hover     { transform: translateY(-3px); }
+        .doc-stat.total     { border-top-color: #6f42c1; }
+        .doc-stat.pending   { border-top-color: #ffc107; }
+        .doc-stat.ready     { border-top-color: #17a2b8; }
+        .doc-stat.completed { border-top-color: #28a745; }
+        .doc-stat .s-icon   { font-size: 1.6em; margin-bottom: 6px; }
+
+        .doc-stat h3 {
+            font-size: 0.75em; color: #888;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            font-weight: 700; margin-bottom: 6px;
+        }
+
+        .doc-stat p { font-size: 1.8em; font-weight: 800; color: #1f2d3d; margin: 0; }
+
+        /* ── Toolbar ── */
+        .doc-toolbar {
+            display: flex; gap: 12px;
+            margin-bottom: 18px; flex-wrap: wrap; align-items: center;
+        }
+
+        .doc-toolbar input,
+        .doc-toolbar select {
+            padding: 10px 14px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 0.91em;
+            outline: none; background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .doc-toolbar input { width: 260px; }
+
+        .doc-toolbar input:focus,
+        .doc-toolbar select:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 3px rgba(111,66,193,0.1);
+        }
+
+        .doc-count { margin-left: auto; font-size: 0.85em; color: #888; font-weight: 600; }
+
+        /* ── Table card ── */
+        .doc-card {
+            background: white; border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.08); overflow: hidden;
+        }
+
+        .doc-table { width: 100%; border-collapse: collapse; }
+
+        .doc-table thead tr { background: #1f2d3d; color: white; }
+
+        .doc-table th {
+            padding: 14px 18px; text-align: left;
+            font-size: 0.8em; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;
+        }
+
+        .doc-table td {
+            padding: 14px 18px; font-size: 0.92em;
+            color: #333; border-bottom: 1px solid #f0f2f5; vertical-align: middle;
+        }
+
+        .doc-table tbody tr:last-child td { border-bottom: none; }
+        .doc-table tbody tr { transition: background 0.15s; }
+        .doc-table tbody tr:hover { background: #fbf8ff; }
+
+        /* ── Patient / Doctor cells ── */
+        .person-cell { display: flex; align-items: center; gap: 11px; }
+
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            color: white; font-weight: 700; font-size: 0.85em;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+
+        .avatar.patient { background: linear-gradient(135deg, #6f42c1, #a78bfa); }
+        .avatar.doctor  { background: linear-gradient(135deg, #28a745, #5cd65c); }
+
+        .person-name   { font-weight: 600; color: #1f2d3d; display: block; }
+        .person-sub    { font-size: 0.8em; color: #888; }
+
+        /* ── Specialty badge ── */
+        .specialty-badge {
+            display: inline-block; padding: 3px 9px;
+            border-radius: 6px; font-size: 0.78em; font-weight: 600;
+            background: #eef5ff; color: #007BFF; margin-top: 3px;
+        }
+
+        /* ── Prescription detail card ── */
+        .rx-detail {
+            background: #f8f9fa; border-radius: 8px;
+            padding: 10px 12px; font-size: 0.85em;
+            line-height: 1.7; max-width: 260px;
+        }
+
+        .rx-detail strong { color: #555; }
+
+        /* ── Status select ── */
+        .doc-status-select {
+            padding: 7px 10px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 0.88em;
+            background: #f9f9f9; cursor: pointer; outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .doc-status-select:focus { border-color: #6f42c1; }
+
+        /* ── Status badges ── */
+        .status-badge {
+            display: inline-block; padding: 5px 13px;
+            border-radius: 20px; font-size: 0.8em;
+            font-weight: 700; text-transform: capitalize;
+        }
+
+        .status-badge.pending   { background: #fff3cd; color: #856404; }
+        .status-badge.ready     { background: #d1ecf1; color: #0c5460; }
+        .status-badge.completed { background: #d4edda; color: #155724; }
+
+        /* ── Save button ── */
+        .doc-save-btn {
+            padding: 7px 16px;
+            background: linear-gradient(135deg, #6f42c1, #a78bfa);
+            color: white; border: none; border-radius: 8px;
+            font-size: 0.84em; font-weight: 700;
+            cursor: pointer; transition: transform 0.15s, opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        .doc-save-btn:hover    { transform: scale(1.05); opacity: 0.9; }
+        .doc-save-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px;
+            padding: 13px 22px; border-radius: 10px;
+            font-weight: 600; font-size: 0.91em; color: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transform: translateY(80px); opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 9999;
+        }
+
+        .toast.show    { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #28a745; }
+        .toast.error   { background: #dc3545; }
+
+        /* ── Empty state ── */
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state .empty-icon { font-size: 3em; margin-bottom: 12px; }
+        .empty-state p     { font-size: 1em; font-weight: 600; color: #888; margin-bottom: 4px; }
+        .empty-state small { font-size: 0.85em; color: #aaa; }
+
+        @media (max-width: 768px) {
+            .doc-content { padding: 20px 15px; }
+            .doc-toolbar input { width: 100%; }
+            .doc-count { margin-left: 0; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">Pharmacist Dashboard</h2>
+        <a href="{{ url_for('pharmacist_dashboard') }}">🏠 Dashboard</a>
+        <a href="{{ url_for('upload_prescription') }}">📄 Patient Prescriptions</a>
+        <a href="{{ url_for('uploaded_doctor') }}">👨‍⚕️ Doctor Prescriptions</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="doc-content">
+
+        <div class="doc-header">
+            <h1>👨‍⚕️ Doctor Prescriptions</h1>
+            <p>Review and dispense prescriptions issued by doctors.</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="doc-stats">
+            <div class="doc-stat total">
+                <div class="s-icon">📋</div>
+                <h3>Total</h3>
+                <p>{{ prescriptions | length }}</p>
+            </div>
+            <div class="doc-stat pending">
+                <div class="s-icon">⏳</div>
+                <h3>Pending</h3>
+                <p>{{ prescriptions | selectattr('status', 'equalto', 'pending') | list | length }}</p>
+            </div>
+            <div class="doc-stat ready">
+                <div class="s-icon">📦</div>
+                <h3>Ready</h3>
+                <p>{{ prescriptions | selectattr('status', 'equalto', 'ready') | list | length }}</p>
+            </div>
+            <div class="doc-stat completed">
+                <div class="s-icon">✅</div>
+                <h3>Completed</h3>
+                <p>{{ prescriptions | selectattr('status', 'equalto', 'completed') | list | length }}</p>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="doc-toolbar">
+            <input type="text" id="docSearch" placeholder="🔍  Search by patient or doctor…">
+            <select id="docStatusFilter">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="ready">Ready</option>
+                <option value="completed">Completed</option>
+            </select>
+            <span class="doc-count" id="docCount"></span>
+        </div>
+
+        <!-- Table -->
+        <div class="doc-card">
+            <table class="doc-table" id="docTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Issued By</th>
+                        <th>Prescription Details</th>
+                        <th>Current Status</th>
+                        <th>Update Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for presc in prescriptions %}
+                    <tr data-status="{{ presc.status }}">
+
+                        <td style="color:#bbb;font-size:0.85em;font-weight:600;">{{ loop.index }}</td>
+
+                        <!-- Patient -->
+                        <td>
+                            <div class="person-cell">
+                                <div class="avatar patient">{{ presc.patient_name[:2] | upper }}</div>
+                                <span class="person-name">{{ presc.patient_name }}</span>
+                            </div>
+                        </td>
+
+                        <!-- Doctor + Specialty -->
+                        <td>
+                            <div class="person-cell">
+                                <div class="avatar doctor">{{ presc.doctor_name[:2] | upper }}</div>
+                                <div>
+                                    <span class="person-name">{{ presc.doctor_name }}</span>
+                                    <span class="specialty-badge">{{ presc.specialty }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Prescription details -->
+                        <td>
+                            <div class="rx-detail">
+                                <strong>💊 Medication:</strong> {{ presc.medication }}<br>
+                                <strong>📋 Dosage:</strong> {{ presc.dosage_instructions }}<br>
+                                <strong>📝 Notes:</strong> {{ presc.additional_notes }}
+                            </div>
+                        </td>
+
+                        <!-- Current status badge -->
+                        <td>
+                            <span class="status-badge {{ presc.status }}" id="dbadge-{{ presc.prescription_id }}">
+                                {{ presc.status }}
+                            </span>
+                        </td>
+
+                        <!-- Dropdown -->
+                        <td>
+                            <select class="doc-status-select" data-id="{{ presc.prescription_id }}">
+                                <option value="pending"   {% if presc.status=='pending'   %}selected{% endif %}>Pending</option>
+                                <option value="ready"     {% if presc.status=='ready'     %}selected{% endif %}>Ready</option>
+                                <option value="completed" {% if presc.status=='completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </td>
+
+                        <!-- Save button -->
+                        <td>
+                            <button class="doc-save-btn" data-id="{{ presc.prescription_id }}">Save</button>
+                        </td>
+
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <p>No doctor prescriptions yet</p>
+                                <small>Prescriptions issued by doctors will appear here.</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `toast ${type} show`;
+        setTimeout(() => { t.className = 'toast'; }, 3200);
+    }
+
+    const searchInput  = document.getElementById('docSearch');
+    const statusFilter = document.getElementById('docStatusFilter');
+    const countEl      = document.getElementById('docCount');
+    const allRows      = document.querySelectorAll('#docTable tbody tr[data-status]');
+
+    function filterTable() {
+        const q      = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+        let visible  = 0;
+
+        allRows.forEach(row => {
+            const patient = row.querySelector('.person-name')?.textContent.toLowerCase() || '';
+            const show    = patient.includes(q) && (!status || row.dataset.status === status);
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+
+        countEl.textContent = `${visible} prescription${visible !== 1 ? 's' : ''} shown`;
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    filterTable();
+
+    document.querySelectorAll('.doc-save-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const prescId = button.dataset.id;
+            const select  = document.querySelector(`.doc-status-select[data-id='${prescId}']`);
+            const status  = select.value;
+
+            button.textContent = 'Saving…';
+            button.disabled    = true;
+
+            fetch('/pharmacy/update_doctor_status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `prescription_id=${encodeURIComponent(prescId)}&status=${encodeURIComponent(status)}`
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const badge = document.getElementById(`dbadge-${prescId}`);
+                    badge.className   = `status-badge ${status}`;
+                    badge.textContent = status;
+                    button.closest('tr').dataset.status = status;
+                    showToast(`Status updated to "${status}" ✔`, 'success');
+                    filterTable();
+                } else {
+                    showToast('Failed to update: ' + (data.message || 'unknown error'), 'error');
+                }
+            })
+            .catch(() => showToast('Network error. Try again.', 'error'))
+            .finally(() => {
+                button.textContent = 'Save';
+                button.disabled    = false;
+            });
+        });
+    });
+</script>
+</body>
+</html>

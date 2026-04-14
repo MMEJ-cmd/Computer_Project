@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy System - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-page">
+    <div class="login-container">
+        <div class="login-form-container">
+
+            <!-- Login Form -->
+            <form class="login-form" method="POST" action="/login">
+                <h2>Login</h2>
+                <input type="email" placeholder="Email" name="email" required>
+                <input type="password" placeholder="Password" name="password" required>
+                <button type="submit">Login</button>
+                <p>Don't have an account? <a href="/register">Register here</a></p>
+            </form>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+        </div>
+    </div>
+</body>
+
+</html>

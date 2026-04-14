@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Progress</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-links">
+            <a href="Admin_dashboard.html" class="nav-home">Dashboard</a>
+             <a href="/login" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+    <div class="admin-container">
+        <h1>Patient Progress</h1>
+
+        <!-- Dropdown to filter request type -->
+        <label for="serviceType">Filter by Service Type:</label>
+        <select id="serviceType" class="admin-select">
+            <option value="all">All</option>
+            <option value="prescription">Prescription Upload</option>
+            <option value="advice">Advice / Minor Ailment</option>
+        </select>
+
+        <table class="pharmacist-table" id="requestsTable">
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Patient Name</th>
+                    <th>Service Type</th>
+                    <th>Branch</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-type="prescription">
+                    <td>001</td>
+                    <td>John Doe</td>
+                    <td>Prescription Upload</td>
+                    <td>Main Branch</td>
+                    <td>Pending</td>
+                    <td>-</td>
+                </tr>
+                <tr data-type="advice">
+                    <td>002</td>
+                    <td>Jane Smith</td>
+                    <td>Advice / Minor Ailment</td>
+                    <td>Main Branch</td>
+                    <td>Ready for Pickup</td>
+                    <td>Pick up from branch A</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <a href="admin_dashboard.html" class="pharmacist-btn back">Back</a>
+    </div>
+
+    <script>
+        // Filter table rows based on dropdown selection
+        const serviceSelect = document.getElementById('serviceType');
+        const tableRows = document.querySelectorAll('#requestsTable tbody tr');
+
+        serviceSelect.addEventListener('change', () => {
+            const selected = serviceSelect.value;
+
+            tableRows.forEach(row => {
+                if (selected === 'all' || row.dataset.type === selected) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="dashboard-wrapper">
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+    <h2 class="logo">Doctor Dashboard</h2>
+    <a href="{{ url_for('doctor_dashboard') }}">🏠 Home</a>
+            <a href="{{ url_for('doctor_appointments') }}">📅 Appointments</a>
+            <a href="{{ url_for('doctor_consultation') }}">🩺 Consultation</a>
+            <a href="{{ url_for('doctor_prescription') }}">📄 Prescription</a>
+            <a href="{{ url_for('doctor_medical_records') }}">🗂️ Medical Records</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+</nav>
+        <div class="presc-container">
+
+            <h2 class="presc-title">Issue Prescription</h2>
+            {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div style="color: green; margin-bottom: 10px;">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+            <form class="presc-form" method="POST">
+    <!-- Patient Name -->
+    <label for="prescPatientName">Patient Name</label>
+    <select id="prescPatientName" name="patient" required>
+        <option value="">Select patient</option>
+        {% for patient in patients %}
+            <option value="{{ patient.user_id }}">{{ patient.full_name }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Medication Name -->
+    <label for="prescMedication">Medication</label>
+    <input type="text" id="prescMedication" name="medication" placeholder="Enter medication name" required>
+
+    <!-- Dosage Instructions -->
+    <label for="prescDosage">Dosage Instructions</label>
+    <textarea id="prescDosage" name="dosage" rows="3" placeholder="Enter dosage instructions" required></textarea>
+
+    <!-- Additional Notes -->
+    <label for="prescNotes">Additional Notes</label>
+    <textarea id="prescNotes" name="notes" rows="3" placeholder="Any additional notes or instructions"></textarea>
+
+    <!-- Save / Issue Button -->
+    <button type="submit" class="presc-save-btn">Issue Prescription</button>
+</form>
+
+        </div>
+
+    </div>
+</body>
+
+</html>

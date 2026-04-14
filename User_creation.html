@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="dashboard-wrapper">
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+             <h2 class="logo">Admin Dashboard</h2>
+            <a href="{{ url_for('admin_dashboard') }}">🏠 Dashboard</a>
+        <a href="{{ url_for('admin_appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('admin_users') }}">👥 Users</a>
+        <a href="{{ url_for('admin_create_user') }}">➕ Create Users</a>
+        <a href="{{ url_for('admin_billing') }}">💳 Billing</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </nav>
+
+        <div class="creation-container">
+            <h1>Create New User</h1>
+           <form class="creation-form" id="createUserForm" method="POST" action="{{ url_for('admin_create_user') }}">
+    <label for="fullName">Full Name</label>
+    <input type="text" id="fullName" name="fullName" placeholder="Enter full name" required>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="Enter email" required>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Enter password" required>
+
+    <label for="role">Role</label>
+    <select id="role" name="role" class="creation-select" required>
+        <option value="">Select role</option>
+        <option value="patient">Patient</option>
+        <option value="doctor">Doctor</option>
+        <option value="pharmacist">Pharmacist</option>
+        <option value="admin">Admin</option>
+    </select>
+    <label for="specialty">Specialty</label>
+<select id="specialty" name="specialty" class="creation-select" required>
+    <option value="">Select Specialty</option>
+    <option value="General Physician">General Physician</option>
+    <option value="Tooth Doctor">Tooth Doctor</option>
+    <option value="Child Doctor">Child Doctor</option>
+    <option value="None">None</option>
+</select>
+    <button type="submit" class="creation-btn">Create User</button>
+</form>
+
+<!-- Flash messages display -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-messages">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+        </div>
+    </div>
+</body>
+
+</html>

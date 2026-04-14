@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Billing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* ---- M-Pesa Modal ---- */
+        .mpesa-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .mpesa-overlay.active { display: flex; }
+
+        .mpesa-modal {
+            background: #fff;
+            border-radius: 18px;
+            padding: 36px 32px;
+            width: 360px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            text-align: center;
+            position: relative;
+        }
+        .mpesa-modal .mpesa-logo {
+            width: 80px;
+            margin-bottom: 12px;
+        }
+        .mpesa-modal h3 {
+            font-size: 1.25em;
+            color: #1f2d3d;
+            margin-bottom: 6px;
+        }
+        .mpesa-modal .amount-display {
+            font-size: 2em;
+            font-weight: 800;
+            color: #00a550;
+            margin: 8px 0 20px;
+        }
+        .mpesa-modal input[type="tel"] {
+            width: 100%;
+            padding: 13px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .mpesa-modal input[type="tel"]:focus {
+            border-color: #00a550;
+        }
+        .mpesa-pay-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00a550, #007a3d);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .mpesa-pay-btn:hover { transform: scale(1.02); }
+        .mpesa-pay-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .mpesa-cancel-btn {
+            display: block;
+            margin-top: 12px;
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.95em;
+            text-decoration: underline;
+        }
+
+        /* Status feedback */
+        .mpesa-status {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+        }
+        .mpesa-status.info    { background: #e8f4fd; color: #0a6fb5; display: block; }
+        .mpesa-status.success { background: #d4edda; color: #155724; display: block; }
+        .mpesa-status.error   { background: #f8d7da; color: #721c24; display: block; }
+
+        /* Spinner */
+        .spinner {
+            display: none;
+            margin: 12px auto 0;
+            width: 36px;
+            height: 36px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #00a550;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .spinner.active { display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Pay button in table */
+        .pay-trigger-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #00a550, #007a3d);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: transform 0.2s;
+        }
+        .pay-trigger-btn:hover { transform: scale(1.05); }
+
+        .paid { color: #155724; font-weight: bold; }
+        .pending { color: #856404; font-weight: bold; }
+
+        .receipt-link {
+            display: inline-block;
+            margin-top: 5px;
+            color: #007BFF;
+            text-decoration: underline;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">MyHealth</h2>
+        <a href="{{ url_for('patient_dashboard') }}">🏠 Home</a>
+        <a href="{{ url_for('appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('review_request') }}">📋 Review Request</a>
+        <a href="{{ url_for('prescription_upload') }}">📄 Prescriptions</a>
+        <a href="{{ url_for('patient_billing') }}">💳 Billing</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="patient-content">
+        <div class="page-header">
+            <h1>💳 My Bills</h1>
+            <p>Manage and pay your medical bills securely via M-Pesa.</p>
+        </div>
+
+        <div class="billing-card">
+            {% if payments %}
+            <table class="billing-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr id="row-{{ p.payment_id }}">
+                        <td>{{ p.source | replace('_', ' ') | title }}</td>
+                        <td class="amount">KES {{ p.amount }}</td>
+                        <td>
+                            {% if p.status == 'paid' %}
+                                <span class="status-badge paid">Paid ✅</span>
+                            {% else %}
+                                <span class="status-badge pending">Pending ⏳</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.status == 'pending' %}
+                                <button class="pay-trigger-btn"
+                                        onclick="openMpesaModal({{ p.payment_id }}, {{ p.amount }})">
+                                    📲 Pay via M-Pesa
+                                </button>
+                            {% else %}
+                                <div class="paid-box">
+                                    ✔ Completed
+                                    {% if p.mpesa_code %}
+                                        <small style="color:#555">Code: {{ p.mpesa_code }}</small>
+                                    {% endif %}
+                                    <a class="receipt-link"
+                                       href="{{ url_for('generate_receipt', payment_id=p.payment_id) }}">
+                                        Download Receipt
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <div class="empty-state">
+                    <p>💳 No bills yet</p>
+                    <small>Your billing history will appear here.</small>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ======== M-Pesa Modal ======== -->
+<div class="mpesa-overlay" id="mpesaOverlay">
+    <div class="mpesa-modal">
+        <!-- Green M-Pesa SVG logo -->
+        <svg class="mpesa-logo" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="40" rx="6" fill="#00a550"/>
+            <text x="50" y="27" font-size="16" font-weight="bold" fill="white"
+                  text-anchor="middle" font-family="Arial, sans-serif">M-PESA</text>
+        </svg>
+
+        <h3>Pay with M-Pesa</h3>
+        <div class="amount-display" id="modalAmount">KES 0</div>
+
+        <input type="tel"
+               id="mpesaPhone"
+               placeholder="e.g. 0712 345 678"
+               maxlength="13">
+
+        <button class="mpesa-pay-btn" id="mpesaPayBtn" onclick="sendStkPush()">
+            Send STK Push
+        </button>
+
+        <div class="spinner" id="mpesaSpinner"></div>
+
+        <div class="mpesa-status" id="mpesaStatus"></div>
+
+        <button class="mpesa-cancel-btn" onclick="closeMpesaModal()">Cancel</button>
+    </div>
+</div>
+
+<script>
+    let activePaymentId = null;
+    let pollInterval    = null;
+
+    /* ---- Open modal ---- */
+    function openMpesaModal(paymentId, amount) {
+        activePaymentId = paymentId;
+        document.getElementById('modalAmount').textContent = 'KES ' + amount;
+        document.getElementById('mpesaPhone').value        = '';
+        document.getElementById('mpesaStatus').className  = 'mpesa-status';
+        document.getElementById('mpesaStatus').textContent = '';
+        document.getElementById('mpesaSpinner').className  = 'spinner';
+        document.getElementById('mpesaPayBtn').disabled    = false;
+        document.getElementById('mpesaOverlay').classList.add('active');
+    }
+
+    /* ---- Close modal ---- */
+    function closeMpesaModal() {
+        document.getElementById('mpesaOverlay').classList.remove('active');
+        if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+    }
+
+    /* ---- Close on backdrop click ---- */
+    document.getElementById('mpesaOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeMpesaModal();
+    });
+
+    /* ---- Show status message ---- */
+    function showStatus(msg, type) {
+        const el = document.getElementById('mpesaStatus');
+        el.textContent = msg;
+        el.className   = 'mpesa-status ' + type;
+    }
+
+    /* ---- Validate Kenyan phone ---- */
+    function validPhone(phone) {
+        const cleaned = phone.replace(/\s|-/g, '');
+        return /^(07|01)\d{8}$/.test(cleaned) ||
+               /^254\d{9}$/.test(cleaned)      ||
+               /^\+254\d{9}$/.test(cleaned);
+    }
+
+    /* ---- Send STK push ---- */
+    function sendStkPush() {
+        const phone = document.getElementById('mpesaPhone').value.trim();
+
+        if (!validPhone(phone)) {
+            showStatus('❌ Invalid phone. Use format 07XXXXXXXX', 'error');
+            return;
+        }
+
+        const btn     = document.getElementById('mpesaPayBtn');
+        const spinner = document.getElementById('mpesaSpinner');
+
+        btn.disabled             = true;
+        spinner.className        = 'spinner active';
+        showStatus('⏳ Sending STK push to your phone…', 'info');
+
+        fetch('/pay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `payment_id=${activePaymentId}&phone=${encodeURIComponent(phone)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'pending') {
+                showStatus('📲 Check your phone! Enter your M-Pesa PIN to complete payment.', 'info');
+                startPolling(activePaymentId);
+            } else {
+                spinner.className = 'spinner';
+                btn.disabled = false;
+                showStatus('❌ ' + (data.message || 'Something went wrong.'), 'error');
+            }
+        })
+        .catch(() => {
+            spinner.className = 'spinner';
+            btn.disabled = false;
+            showStatus('❌ Network error. Please try again.', 'error');
+        });
+    }
+
+    /* ---- Poll every 4 s to detect callback confirmation ---- */
+    function startPolling(paymentId) {
+        let attempts = 0;
+        const maxAttempts = 30; // ~2 min
+
+        pollInterval = setInterval(() => {
+            attempts++;
+
+            fetch(`/pay/status/${paymentId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'paid') {
+                    clearInterval(pollInterval);
+                    document.getElementById('mpesaSpinner').className = 'spinner';
+                    const code = data.mpesa_code ? ` (${data.mpesa_code})` : '';
+                    showStatus(`✅ Payment confirmed${code}! Thank you.`, 'success');
+
+                    // Update table row without full reload
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2500);
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(pollInterval);
+                    document.getElementById('mpesaSpinner').className = 'spinner';
+                    document.getElementById('mpesaPayBtn').disabled   = false;
+                    showStatus('⏰ Timed out. If you paid, the page will update shortly.', 'error');
+                }
+            })
+            .catch(err => console.warn('Polling error:', err));
+        }, 4000);
+    }
+</script>
+</body>
+</html>

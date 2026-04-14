@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .consult-flash {
+            margin-top: 18px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-align: center;
+        }
+
+        /* Flask flashes without a category arrive as class "message" */
+        .consult-flash.message,
+        .consult-flash.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .consult-flash.error,
+        .consult-flash.danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2 class="logo">Doctor Dashboard</h2>
+            <a href="{{ url_for('doctor_dashboard') }}">🏠 Home</a>
+            <a href="{{ url_for('doctor_appointments') }}">📅 Appointments</a>
+            <a href="{{ url_for('doctor_consultation') }}">🩺 Consultation</a>
+            <a href="{{ url_for('doctor_prescription') }}">📄 Prescription</a>
+            <a href="{{ url_for('doctor_medical_records') }}">🗂️ Medical Records</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </nav>
+
+        <div class="consult-container">
+
+            <h2 class="consult-title">Patient Consultation</h2>
+
+            <form class="consult-form" method="POST" action="{{ url_for('doctor_consultation') }}">
+
+                <!-- Patient Name -->
+                <label for="consultName">Patient Name</label>
+                <select id="consultName" name="patient_id" required>
+                    <option value="">Select Patient</option>
+                    {% for patient in patients %}
+                        <option value="{{ patient.patient_id }}">{{ patient.full_name }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Diagnosis Note -->
+                <label for="consultDiagnosis">Diagnosis Note</label>
+                <textarea id="consultDiagnosis" name="diagnosis" rows="3" required></textarea>
+
+                <!-- Symptoms -->
+                <label for="consultSymptoms">Symptoms</label>
+                <textarea id="consultSymptoms" name="symptoms" rows="3" required></textarea>
+
+                <!-- Save Button -->
+                <button type="submit" class="consult-save-btn">Save</button>
+            </form>
+
+            <!-- Flash messages displayed HERE so they stay on this page -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="consult-flash {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+        </div>
+    </div>
+</body>
+
+</html>

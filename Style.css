@@ -1,0 +1,1828 @@
+/* COMMON STYLING FOR BOTH PAGES */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    margin :0;
+    font-family: 'Courier New', Courier, monospace;
+    background: #f0f2f5;
+}
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* LOGIN PAGE STYLES */
+.login-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 350px;
+}
+
+.login-form-container {
+    width: 100%;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form h2 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.login-form input {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-form button {
+    padding: 10px;
+    border: none;
+    background: #007BFF;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-form button:hover {
+    background: #0056b3;
+}
+
+.login-form p {
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.login-form p a {
+    color: #007BFF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* REGISTER PAGE STYLES */
+.register-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 350px;
+}
+
+.register-form-container {
+    width: 100%;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.register-form h2 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.register-form input {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.register-form button {
+    padding: 10px;
+    border: none;
+    background: #007BFF;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.register-form button:hover {
+    background: #0056b3;
+}
+
+.register-form p {
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.register-form p a {
+    color: #007BFF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+/* Navbar Styles */
+/* Wrapper */
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 230px;
+    background: #1f2d3d;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Logo */
+.sidebar .logo {
+    margin-bottom: 30px;
+}
+
+/* Sidebar Links */
+.sidebar a {
+    text-decoration: none;
+    color: white;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    background: #34495e;
+}
+
+/* Logout button */
+.logout-btn {
+    margin-top: auto;
+    padding: 10px;
+    background: #dc3545;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background: #a71d2a;
+}
+
+/* PATIENT  DASHBOARD STYLES */
+/* Patient content */
+.patient-content {
+    flex: 1;
+    padding: 30px;
+    background: #f4f6f9;
+}
+/* Container beside navbar */
+.patient-container {
+    background: transparent;
+    padding: 40px 20px;
+    border-radius: 0;
+    box-shadow: none;
+    max-width: 1200px;
+    width: 100%;
+    margin-top: 80px; /* enough space for sticky navbar */
+    margin: 30px auto 50px auto; /* top margin ensures space below navbar */
+    text-align: center;
+    clear: both;  /* make sure it doesn’t sit beside navbar */
+}
+
+/* Advice Request Page Styling */
+/* Appointment Container */
+.appointment-container {
+    max-width: 500px;
+    width :90%;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Title */
+.appointment-title {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #1f2d3d;
+}
+
+/* Form Groups */
+.appointment-group {
+    margin-bottom: 20px;
+}
+
+/* Labels */
+.appointment-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+/* Inputs & Select */
+.appointment-input,
+.appointment-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.appointment-input:focus,
+.appointment-select:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0,123,255,0.3);
+}
+
+/* Button */
+.appointment-btn {
+    width: 100%;
+    padding: 12px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.appointment-btn:hover {
+    background: #0056b3;
+    transform: scale(1.02);
+}
+/* Prescription Upload Page Styling */
+.prescription-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 30px auto;
+    text-align: left;
+    font-family: Arial, sans-serif;
+}
+
+.prescription-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.prescription-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.prescription-form label {
+    font-weight: bold;
+}
+
+.prescription-form input[type="text"],
+.prescription-form input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.prescription-form button {
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background: #007BFF;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.prescription-form button:hover {
+    background: #0056b3;
+    transform: scale(1.02);
+}
+/* Review Request Page Styling */
+/* Container */
+.review-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Title */
+.review-title {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #1f2d3d;
+}
+
+/* Table */
+.review-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.review-table th {
+    background: #1f2d3d;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.review-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.review-table tr:hover {
+    background: #f4f6f9;
+}
+
+/* Status Styling */
+.review-status.pending {
+    color: #ff9800;
+    font-weight: bold;
+}
+
+.review-status.complete {
+    color: #28a745;
+    font-weight: bold;
+}
+
+/*  DOCTOR STYLES  */
+/* Doctor Container */
+.doctor-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Title */
+.doctor-title {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #1f2d3d;
+}
+/*  Doctor appointment  */
+/* Table */
+.doctor-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.doctor-table th {
+    background: #1f2d3d;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.doctor-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.doctor-table tr:hover {
+    background: #f4f6f9;
+}
+/* Doctor Table - Status and Update Button Styling */
+.doctor-status {
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 0.95em;
+}
+
+.doctor-update-btn {
+    padding: 6px 12px;
+    background: #007BFF;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.doctor-update-btn:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+/* Consultation Page Styling */
+.consult-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    margin: 30px auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+}
+
+.consult-title {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.consult-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.consult-form label {
+    font-weight: bold;
+}
+
+.consult-form input,
+.consult-form textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 1em;
+}
+
+.consult-save-btn {
+    padding: 12px;
+    background: #007BFF;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.consult-save-btn:hover {
+    background: #0056b3;
+    transform: scale(1.02);
+}
+/* Issue Prescription Page Styling */
+.presc-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    margin: 30px auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+}
+
+.presc-title {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.presc-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.presc-form label {
+    font-weight: bold;
+}
+
+.presc-form input,
+.presc-form textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 1em;
+}
+
+.presc-save-btn {
+    padding: 12px;
+    background:rgb(65, 149, 182);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.presc-save-btn:hover {
+    background: #218838;
+    transform: scale(1.02);
+}
+
+   /* Medical Record Container */
+   .medical-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    max-width: 900px;
+    margin: 30px auto;
+    font-family: Arial, sans-serif;
+}
+
+.medical-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+.medical-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.medical-table th,
+.medical-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.medical-table th {
+    background: #007BFF;
+    color: white;
+}
+
+.medical-table tr:nth-child(even) {
+    background: #f0f2f5;
+}
+
+.medical-table tr:hover {
+    background: #d0e0ff;
+    transition: 0.2s;
+}
+
+
+/* PHARMACIST STYLES */
+.pharmacist-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    width: 600px;
+    margin: 20px auto;
+}
+/*  UPLOAD PRESCRIPTION STYLE */
+.prescription-upload-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    margin: 30px auto;
+    font-family: Arial, sans-serif;
+}
+
+.prescription-upload-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.prescription-upload-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.prescription-upload-table th,
+.prescription-upload-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.prescription-upload-table th {
+    background: #007BFF;
+    color: white;
+}
+
+.prescription-upload-table tr:nth-child(even) {
+    background: #f0f2f5;
+}
+
+.prescription-upload-table tr:hover {
+    background: #d0e0ff;
+    transition: 0.2s;
+}
+
+.download-btn,
+.update-btn {
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.download-btn {
+    background: #28a745;
+}
+
+.download-btn:hover {
+    background: #1e7e34;
+}
+
+.update-btn {
+    background: #007BFF;
+    border: none;
+}
+
+.update-btn:hover {
+    background: #0056b3;
+}
+
+.status-select {
+    padding: 6px 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+/*   DOCTOR_PRESCRIPTION STYLING  */
+.typed-prescription-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    margin: 30px auto;
+    font-family: Arial, sans-serif;
+}
+
+.typed-prescription-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.typed-prescription-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.typed-prescription-table th,
+.typed-prescription-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.typed-prescription-table th {
+    background: #007BFF;
+    color: white;
+}
+
+.typed-prescription-table tr:nth-child(even) {
+    background: #f0f2f5;
+}
+
+.typed-prescription-table tr:hover {
+    background: #d0e0ff;
+    transition: 0.2s;
+}
+
+.update-btn {
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+    background: #007BFF;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.update-btn:hover {
+    background: #0056b3;
+}
+
+.status-select {
+    padding: 6px 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+
+.prescription-text {
+    text-align: left;
+    max-width: 300px;
+    white-space: pre-line;
+    /* preserves line breaks */
+}
+/* Admin Dashboard Styling (similar to Patient Dashboard) */
+
+   /* User Management Page Styling */
+   .admin-users-container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    max-width: 1200px;
+    width: 90%;
+    margin: 30px auto 50px auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+.admin-users-container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.admin-search-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#searchUser {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 250px;
+}
+
+.role-select {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+}
+
+.user-table th {
+    background: #007BFF;
+    color: white;
+}
+
+.user-table tr:nth-child(even) {
+    background: #f0f2f5;
+}
+
+.user-table tr:hover {
+    background: #d0e0ff;
+    transition: 0.2s;
+}
+
+.delete-btn {
+    padding: 6px 12px;
+    background: #dc3545;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s;
+}
+
+.delete-btn:hover {
+    background: #a71d2a;
+}
+/* USER CREATION PAGE */
+.creation-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 90%;
+    margin: 30px auto;
+    font-family: Arial, sans-serif;
+    text-align: left;
+  }
+  
+  .creation-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .creation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .creation-form label {
+    font-weight: bold;
+  }
+  
+  .creation-form input,
+  .creation-form select,
+  .creation-form button {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 100%;
+  }
+  
+  .creation-btn {
+    background: #007BFF;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s;
+  }
+  
+  .creation-btn:hover {
+    background: #0056b3;
+  }
+ /* Admin Appointments Page Styling */
+        .admin-appointments-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 1200px;
+            width: 90%;
+            margin: 30px auto 50px auto;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+        }
+
+        .admin-appointments-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-appointments-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .admin-appointments-table th,
+        .admin-appointments-table td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .admin-appointments-table th {
+            background: #007BFF;
+            color: white;
+        }
+
+        .admin-appointments-table tr:nth-child(even) {
+            background: #f0f2f5;
+        }
+
+        .admin-appointments-table tr:hover {
+            background: #d0e0ff;
+            transition: 0.2s;
+        }
+
+        /* Update button styling */
+        .update-btn {
+            padding: 6px 12px;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .update-btn:hover {
+            background: #1e7e34;
+        }
+
+        /* Dropdown for status update */
+        .status-select {
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+.flash-messages {
+    list-style: none;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #d4edda;
+    color: #155724;
+    border-radius: 5px;
+}
+
+
+
+
+/* PATIENT DASHBOARD */
+/* Welcome Card */
+.welcome-card {
+    background: linear-gradient(135deg, #007BFF, #00c6ff);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    text-align: left;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.welcome-card h1 {
+    margin-bottom: 10px;
+}
+
+/* Grid Layout */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    text-align: left;
+    transition: 0.3s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Card Button */
+.card-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: #007BFF;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.card-btn:hover {
+    background: #0056b3;
+}
+
+
+
+/*  PATIENTS APPOINTMENT DASHBOARD */
+/* Page Header */
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-header h1 {
+    color: #1f2d3d;
+    margin-bottom: 5px;
+}
+
+/* Appointment Card */
+.appointment-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Form layout spacing */
+.appointment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Inputs */
+.appointment-input,
+.appointment-select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+}
+
+.appointment-input:focus,
+.appointment-select:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 6px rgba(0,123,255,0.3);
+    outline: none;
+}
+
+/* Button */
+.appointment-btn {
+    padding: 12px;
+    background: linear-gradient(135deg, #007BFF, #00c6ff);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.appointment-btn:hover {
+    transform: scale(1.03);
+}
+
+/* Flash Messages */
+.flash-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.flash-message.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.flash-message.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+
+
+
+/*   PATIENTS REVIEW PAGE  */
+/* Review Card */
+.review-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Description cell */
+.desc-cell {
+    text-align: left;
+    max-width: 300px;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+/* Status colors */
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+}
+
+
+
+
+
+/*    PATIENT PRESCRIPTION UPLOAD   */
+/* Upload Card */
+.upload-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* File Upload Box */
+.file-upload-box {
+    border: 2px dashed #007BFF;
+    padding: 25px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    transition: 0.3s;
+    background: #f9fbff;
+}
+
+.file-upload-box:hover {
+    background: #eef5ff;
+}
+
+/* Hide default input */
+.file-upload-box input {
+    display: none;
+}
+
+/* Label */
+.file-label {
+    cursor: pointer;
+    font-weight: bold;
+    color: #007BFF;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Upload Button */
+.upload-btn {
+    padding: 12px;
+    background: linear-gradient(135deg, #28a745, #5cd65c);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.upload-btn:hover {
+    transform: scale(1.03);
+}
+
+
+
+
+/*   PATIENT BILLING PAGE   */
+/* Billing Card */
+.billing-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Table */
+.billing-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout:fixed;
+}
+
+.billing-table th {
+    background: #1f2d3d;
+    color: white;
+    padding: 12px;
+    text-align: left; /* 🔥 ensures vertical alignment */
+    vertical-align: middle;
+}
+
+.billing-table td {
+    padding: 12px;
+    text-align: left; /* 🔥 ensures vertical alignment */
+    vertical-align: middle;
+}
+.billing-table tr:hover {
+    background: #f4f6f9;
+}
+
+/* Amount styling */
+.amount {
+    font-weight: bold;
+    color: #007BFF;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.status-badge.paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Payment box */
+.payment-box {
+    display: flex;
+    gap: 8px;
+}
+
+.payment-box input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* Button */
+.payment-box button {
+    background: linear-gradient(135deg, #28a745, #5cd65c);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.payment-box button:hover {
+    transform: scale(1.05);
+}
+
+/* Paid section */
+.paid-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.paid-box a {
+    color: #007BFF;
+    text-decoration: underline;
+    font-size: 0.9em;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+}
+
+
+
+
+/*     PHARMACIST DASHBOARD    */
+/* Container spacing */
+.pharmacist-container {
+    padding: 20px;
+}
+
+/* Stats grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Stat cards */
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+.stat-card p {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+/* Status colors */
+.stat-card.pending {
+    border-left: 5px solid #ffc107;
+}
+
+.stat-card.ready {
+    border-left: 5px solid #17a2b8;
+}
+
+.stat-card.completed {
+    border-left: 5px solid #28a745;
+}
+
+/* Action grid */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* Action cards */
+.action-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.action-card h3 {
+    margin-bottom: 10px;
+}
+
+.action-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #007BFF, #00c6ff);
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+}
+
+
+
+/*  DOCTOR CONSULTATION PAGE     */
+/* =========================
+   CONSULTATION PAGE STYLING
+   ========================= */
+
+/* Consultation Container */
+.consult-container {
+    background: white;
+    padding: 40px 30px;
+    max-width: 700px;
+    margin: 30px auto;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+/* Title */
+.consult-title {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 30px;
+    color: #1f2d3d;
+}
+
+/* Form Styling */
+.consult-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Labels */
+.consult-form label {
+    font-weight: 600;
+    color: #333;
+    font-size: 1em;
+}
+
+/* Inputs and Textareas */
+.consult-form select,
+.consult-form input,
+.consult-form textarea {
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.consult-form select:focus,
+.consult-form input:focus,
+.consult-form textarea:focus {
+    outline: none;
+    border-color: #007BFF;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+}
+
+/* Save Button */
+.consult-save-btn {
+    padding: 14px;
+    background: linear-gradient(135deg, #007BFF, #00c6ff);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+    font-size: 1.1em;
+}
+
+.consult-save-btn:hover {
+    transform: scale(1.03);
+    background: linear-gradient(135deg, #0056b3, #009fcc);
+}
+
+
+
+
+/* ==============================
+   ISSUE PRESCRIPTION PAGE STYLING
+   ============================== */
+
+/* Prescription Container */
+.presc-container {
+    background: white;
+    padding: 40px 35px;
+    max-width: 700px;
+    margin: 30px auto;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+/* Title */
+.presc-title {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 30px;
+    color: #1f2d3d;
+}
+
+/* Flash Messages */
+.presc-container div {
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    background-color: #d4edda;
+    color: #155724;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Form Styling */
+.presc-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Labels */
+.presc-form label {
+    font-weight: 600;
+    font-size: 1em;
+    color: #333;
+}
+
+/* Inputs and Textareas */
+.presc-form input,
+.presc-form select,
+.presc-form textarea {
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.presc-form input:focus,
+.presc-form select:focus,
+.presc-form textarea:focus {
+    outline: none;
+    border-color: #007BFF;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+}
+
+/* Save / Issue Button */
+.presc-save-btn {
+    padding: 14px;
+    background: linear-gradient(135deg, #41b5b6, #218838);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+    font-size: 1.1em;
+}
+
+.presc-save-btn:hover {
+    transform: scale(1.03);
+    background: linear-gradient(135deg, #218838, #17622b);
+}
+
+
+
+
+/* ========================
+   ADMIN DASHBOARD STYLING
+   ======================== */
+
+/* Container styling */
+.patient-container h1 {
+    font-size: 2em;
+    color: #1f2d3d;
+    margin-bottom: 10px;
+}
+
+.patient-container p {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+/* Quick Stats Grid */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #007BFF, #00c6ff);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card h3 {
+    font-size: 1em;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.stat-card p {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+/* Action Buttons Grid */
+.admin-action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.action-card h3 {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.action-btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #41b5b6, #218838);
+    color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #218838, #17622b);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-stats-grid,
+    .admin-action-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/*     DOCTOR DASHBOARD */
+        /* ── Doctor Welcome Banner ── */
+        .doctor-welcome-card {
+            background: linear-gradient(135deg, #1a6b4a, #28a745, #56d38a);
+            color: white;
+            padding: 35px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .doctor-welcome-card::after {
+            content: "🩺";
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 5em;
+            opacity: 0.18;
+        }
+
+        .doctor-welcome-card h1 {
+            margin-bottom: 8px;
+            font-size: 1.9em;
+        }
+
+        .doctor-welcome-card p {
+            font-size: 1.05em;
+            opacity: 0.92;
+            margin: 0;
+        }
+
+        /* ── Stats Grid ── */
+        .doctor-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .doctor-stat-card {
+            background: white;
+            padding: 22px 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.3s;
+            border-top: 4px solid #28a745;
+        }
+
+        .doctor-stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .doctor-stat-card.appointments { border-top-color: #007BFF; }
+        .doctor-stat-card.consultations { border-top-color: #fd7e14; }
+        .doctor-stat-card.prescriptions { border-top-color: #28a745; }
+        .doctor-stat-card.records      { border-top-color: #6f42c1; }
+
+        .doctor-stat-card .stat-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .doctor-stat-card h3 {
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .doctor-stat-card p {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1f2d3d;
+            margin: 0;
+        }
+
+        /* ── Section Label ── */
+        .section-label {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #1f2d3d;
+            margin-bottom: 18px;
+            padding-left: 4px;
+            border-left: 4px solid #28a745;
+            padding-left: 12px;
+        }
+
+        /* ── Action Cards Grid ── */
+        .doctor-action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+        }
+
+        .doctor-action-card {
+            background: white;
+            padding: 28px 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            text-align: left;
+            transition: transform 0.2s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .doctor-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.13);
+        }
+
+        .card-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin-bottom: 4px;
+        }
+
+        .icon-blue   { background: #e8f0fe; }
+        .icon-orange { background: #fff3e0; }
+        .icon-green  { background: #e8f5e9; }
+        .icon-purple { background: #f3e8fd; }
+
+        .doctor-action-card h3 {
+            font-size: 1.05em;
+            color: #1f2d3d;
+            margin: 0;
+        }
+
+        .doctor-action-card p {
+            font-size: 0.88em;
+            color: #777;
+            margin: 0;
+            flex: 1;
+        }
+
+        .doctor-card-btn {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.2s, opacity 0.2s;
+            align-self: flex-start;
+        }
+
+        .doctor-card-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.92;
+        }
+
+        .btn-blue   { background: linear-gradient(135deg, #007BFF, #00c6ff); }
+        .btn-orange { background: linear-gradient(135deg, #fd7e14, #ffb347); }
+        .btn-green  { background: linear-gradient(135deg, #28a745, #5cd65c); }
+        .btn-purple { background: linear-gradient(135deg, #6f42c1, #a78bfa); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .doctor-stats-grid,
+            .doctor-action-grid {
+                grid-template-columns: 1fr;
+            }
+        }

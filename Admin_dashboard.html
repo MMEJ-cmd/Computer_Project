@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_dashboard.css') }}">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2 class="logo">Admin Dashboard</h2>
+            <a href="{{ url_for('admin_dashboard') }}">🏠 Dashboard</a>
+            <a href="{{ url_for('admin_appointments') }}">📅 Appointments</a>
+            <a href="{{ url_for('admin_users') }}">👥 Users</a>
+            <a href="{{ url_for('admin_create_user') }}">➕ Create Users</a>
+            <a href="{{ url_for('admin_billing') }}">💳 Billing</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="patient-content">
+            <div class="patient-container">
+                <h1>Welcome, Admin!</h1>
+
+                <!-- Quick Stats -->
+                <div class="admin-stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Appointments</h3>
+                        <p>128</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Registered Users</h3>
+                        <p>56</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Pending Requests</h3>
+                        <p>12</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Completed Tasks</h3>
+                        <p>102</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="admin-action-grid">
+                    <div class="action-card">
+                        <h3>📅 Manage Appointments</h3>
+                        <a href="{{ url_for('admin_appointments') }}" class="action-btn">Go</a>
+                    </div>
+                    <div class="action-card">
+                        <h3>👥 Manage Users</h3>
+                        <a href="{{ url_for('admin_users') }}" class="action-btn">Go</a>
+                    </div>
+                    <div class="action-card">
+                        <h3>➕ Create New User</h3>
+                        <a href="{{ url_for('admin_create_user') }}" class="action-btn">Go</a>
+                    </div>
+                    <div class="action-card">
+                        <h3>💳 Billing & Payments</h3>
+                        <a href="{{ url_for('admin_billing') }}" class="action-btn">Go</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

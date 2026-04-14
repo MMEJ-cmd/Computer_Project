@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacist Dashboard</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+    <h2 class="logo">Pharmacist Dashboard</h2>
+    <a href="{{ url_for('pharmacist_dashboard') }}">🏠 Dashboard</a>
+        <a href="{{ url_for('upload_prescription') }}">📄 Patient Prescriptions</a>
+        <a href="{{ url_for('uploaded_doctor') }}">👨‍⚕️ Doctor Prescriptions</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </nav>
+        <div class="pharmacist-container">
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>💊 Pharmacist Dashboard</h1>
+        <p>Manage prescriptions and track patient medication status.</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <h3>📄 Total Prescriptions</h3>
+            <p>{{ total_prescriptions or 0 }}</p>
+        </div>
+
+        <div class="stat-card pending">
+            <h3>⏳ Pending</h3>
+            <p>{{ pending_count or 0 }}</p>
+        </div>
+
+        <div class="stat-card ready">
+            <h3>📦 Ready</h3>
+            <p>{{ ready_count or 0 }}</p>
+        </div>
+
+        <div class="stat-card completed">
+            <h3>✅ Completed</h3>
+            <p>{{ completed_count or 0 }}</p>
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="action-grid">
+
+        <div class="action-card">
+            <h3>📄 Patient Prescriptions</h3>
+            <p>View uploaded prescriptions from patients.</p>
+            <a href="{{ url_for('upload_prescription') }}" class="action-btn">Open</a>
+        </div>
+
+        <div class="action-card">
+            <h3>👨‍⚕️ Doctor Prescriptions</h3>
+            <p>View prescriptions issued by doctors.</p>
+            <a href="{{ url_for('uploaded_doctor') }}" class="action-btn">Open</a>
+        </div>
+
+    </div>
+
+</div>
+    </div>
+</body>
+
+</html>

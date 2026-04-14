@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy System - Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-page">
+    <div class="register-container">
+        <div class="register-form-container">
+
+            <!-- Registration Form -->
+            <form class="register-form" method="POST" action="/register">
+                <h2>Register</h2>
+                <input type="text" placeholder="Full Name" name="fullname" required>
+                <input type="email" placeholder="Email" name="email" required>
+                <input type="password" placeholder="Password" name="password" required>
+                <input type="password" placeholder="Confirm Password" name="confirm_password" required>
+                <button type="submit">Register</button>
+                <p>Already have an account? <a href="/login">Login here</a></p>
+            </form>
+
+        </div>
+    </div>
+</body>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul style="color: green; text-align:center; margin-top:10px;">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+</html>

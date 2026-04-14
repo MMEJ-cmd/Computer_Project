@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h2 class="logo">Doctor Dashboard</h2>
+            <a href="{{ url_for('doctor_dashboard') }}">🏠 Home</a>
+            <a href="{{ url_for('doctor_appointments') }}">📅 Appointments</a>
+            <a href="{{ url_for('doctor_consultation') }}">🩺 Consultation</a>
+            <a href="{{ url_for('doctor_prescription') }}">📄 Prescription</a>
+            <a href="{{ url_for('doctor_medical_records') }}">🗂️ Medical Records</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="patient-content">
+
+            <!-- Welcome Banner -->
+            <div class="doctor-welcome-card">
+                <h1>Welcome, Doctor! 👋</h1>
+                <p>Here's an overview of your patients and today's activities.</p>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="doctor-stats-grid">
+                <div class="doctor-stat-card appointments">
+                    <div class="stat-icon">📅</div>
+                    <h3>Appointments</h3>
+                    <p>{{ total_appointments or 0 }}</p>
+                </div>
+                <div class="doctor-stat-card consultations">
+                    <div class="stat-icon">🩺</div>
+                    <h3>Consultations</h3>
+                    <p>{{ total_consultations or 0 }}</p>
+                </div>
+                <div class="doctor-stat-card prescriptions">
+                    <div class="stat-icon">📄</div>
+                    <h3>Prescriptions</h3>
+                    <p>{{ total_prescriptions or 0 }}</p>
+                </div>
+                <div class="doctor-stat-card records">
+                    <div class="stat-icon">🗂️</div>
+                    <h3>Medical Records</h3>
+                    <p>{{ total_records or 0 }}</p>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-label">Quick Actions</div>
+            <div class="doctor-action-grid">
+
+                <div class="doctor-action-card">
+                    <div class="card-icon-wrap icon-blue">📅</div>
+                    <h3>Patient Appointments</h3>
+                    <p>View and manage all scheduled patient appointments for your specialty.</p>
+                    <a href="{{ url_for('doctor_appointments') }}" class="doctor-card-btn btn-blue">View Appointments</a>
+                </div>
+
+                <div class="doctor-action-card">
+                    <div class="card-icon-wrap icon-orange">🩺</div>
+                    <h3>Consultation</h3>
+                    <p>Record patient diagnoses and symptoms from your current consultations.</p>
+                    <a href="{{ url_for('doctor_consultation') }}" class="doctor-card-btn btn-orange">Start Consultation</a>
+                </div>
+
+                <div class="doctor-action-card">
+                    <div class="card-icon-wrap icon-green">📄</div>
+                    <h3>Issue Prescription</h3>
+                    <p>Write and issue prescriptions directly to patients and the pharmacy.</p>
+                    <a href="{{ url_for('doctor_prescription') }}" class="doctor-card-btn btn-green">Issue Prescription</a>
+                </div>
+
+                <div class="doctor-action-card">
+                    <div class="card-icon-wrap icon-purple">🗂️</div>
+                    <h3>Medical Records</h3>
+                    <p>Access and review your patients' full medical history and records.</p>
+                    <a href="{{ url_for('doctor_medical_records') }}" class="doctor-card-btn btn-purple">View Records</a>
+                </div>
+
+            </div>
+
+        </div><!-- end patient-content -->
+    </div><!-- end dashboard-wrapper -->
+</body>
+
+</html>

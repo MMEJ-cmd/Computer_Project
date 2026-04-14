@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advice Request / Minor Ailment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">MyHealth</h2>
+
+        <a href="{{ url_for('patient_dashboard') }}">🏠 Home</a>
+        <a href="{{ url_for('appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('review_request') }}">📋 Review Request</a>
+        <a href="{{ url_for('prescription_upload') }}">📄 Prescriptions</a>
+        <a href="{{ url_for('patient_billing') }}">💳 Billing</a>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="patient-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📅 Book an Appointment</h1>
+            <p>Select your doctor type and preferred time.</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="appointment-card">
+
+            <form class="appointment-form" method="POST" action="{{ url_for('book_appointment') }}">
+
+                <div class="appointment-group">
+                    <label>Doctor Specialty</label>
+                    <select name="specialty" class="appointment-select" required>
+                        <option value="">Select Doctor Type</option>
+                        <option value="General Physician">General Physician</option>
+                        <option value="Tooth Doctor">Tooth Doctor</option>
+                        <option value="Child Doctor">Child Doctor</option>
+                    </select>
+                </div>
+
+                <div class="appointment-group">
+                    <label>Preferred Date</label>
+                    <input type="date" id="appointmentDate" name="appointment_date" class="appointment-input" required>
+                </div>
+
+                <div class="appointment-group">
+                    <label>Preferred Time</label>
+                    <input type="time" id="appointmentTime" name="appointment_time" class="appointment-input" required>
+                </div>
+
+                <button type="submit" class="appointment-btn">Confirm Appointment</button>
+            </form>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+        </div>
+
+    </div>
+</div>
+</body>
+<script id="3jbb78">
+document.addEventListener("DOMContentLoaded", function() {
+    let today = new Date().toISOString().split("T")[0];
+    document.getElementById("appointmentDate").setAttribute("min", today);
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    let dateInput = document.getElementById("appointmentDate");
+    let timeInput = document.getElementById("appointmentTime");
+
+    // Prevent past dates
+    let today = new Date().toISOString().split("T")[0];
+    dateInput.setAttribute("min", today);
+
+    // Set default working hours
+    const workStart = "08:00";
+    const workEnd = "17:00";
+    timeInput.setAttribute("min", workStart);
+    timeInput.setAttribute("max", workEnd);
+
+    dateInput.addEventListener("change", function() {
+        let selectedDate = dateInput.value;
+        let now = new Date();
+        let currentDate = now.toISOString().split("T")[0];
+
+        if (selectedDate === currentDate) {
+            // Prevent past time for today
+            let hours = String(now.getHours()).padStart(2, '0');
+            let minutes = String(now.getMinutes()).padStart(2, '0');
+            let currentTime = hours + ":" + minutes;
+
+            // Ensure the min time respects working hours
+            timeInput.setAttribute("min", currentTime > workStart ? currentTime : workStart);
+
+        } else {
+            // Reset min time to start of working hours
+            timeInput.setAttribute("min", workStart);
+        }
+
+        // Max time stays the same
+        timeInput.setAttribute("max", workEnd);
+    });
+
+});
+</script>
+</html>

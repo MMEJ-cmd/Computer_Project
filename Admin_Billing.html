@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Billing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .billing-content {
+            flex: 1; padding: 35px 30px;
+            background: #f4f6f9; overflow-y: auto;
+        }
+        .billing-page-header { margin-bottom: 28px; }
+        .billing-page-header h1 { font-size: 1.75em; color: #1f2d3d; margin-bottom: 4px; }
+        .billing-page-header p  { color: #6c757d; font-size: 0.95em; }
+
+        /* Report button */
+        .report-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #28a745, #5cd65c);
+            color: white; border: none; border-radius: 10px;
+            font-size: 0.9em; font-weight: 700; cursor: pointer;
+            text-decoration: none; transition: transform 0.15s, opacity 0.2s;
+            margin-bottom: 24px;
+        }
+        .report-btn:hover { transform: scale(1.04); opacity: 0.92; }
+
+        /* Stats */
+        .billing-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 18px; margin-bottom: 28px;
+        }
+        .b-stat {
+            background: white; padding: 20px;
+            border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+            text-align: center; border-top: 4px solid #007BFF;
+        }
+        .b-stat.paid-card    { border-top-color: #28a745; }
+        .b-stat.pending-card { border-top-color: #ffc107; }
+        .b-stat.revenue-card { border-top-color: #6f42c1; }
+        .b-stat.total-card   { border-top-color: #007BFF; }
+        .b-stat h3 {
+            font-size: 0.8em; color: #666; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 700;
+        }
+        .b-stat p { font-size: 1.7em; font-weight: bold; color: #1f2d3d; margin: 0; }
+
+        /* Toolbar */
+        .billing-toolbar {
+            display: flex; gap: 12px; margin-bottom: 18px;
+            flex-wrap: wrap; align-items: center;
+        }
+        .billing-toolbar input,
+        .billing-toolbar select {
+            padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 0.91em; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .billing-toolbar input { width: 250px; }
+        .billing-toolbar input:focus,
+        .billing-toolbar select:focus {
+            border-color: #007BFF; box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        /* Table */
+        .billing-card { background: white; border-radius: 16px; box-shadow: 0 8px 28px rgba(0,0,0,0.08); overflow: hidden; }
+        .billing-table { width: 100%; border-collapse: collapse; }
+        .billing-table thead tr { background: #1f2d3d; color: white; }
+        .billing-table th {
+            padding: 14px 18px; text-align: left; font-size: 0.8em;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;
+        }
+        .billing-table td {
+            padding: 14px 18px; font-size: 0.92em; color: #333;
+            border-bottom: 1px solid #f0f2f5; vertical-align: middle;
+        }
+        .billing-table tbody tr:last-child td { border-bottom: none; }
+        .billing-table tbody tr { transition: background 0.15s; }
+        .billing-table tbody tr:hover { background: #f7faff; }
+        .patient-cell { display: flex; align-items: center; gap: 11px; }
+        .avatar {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(135deg, #007BFF, #00c6ff);
+            color: white; font-weight: 700; font-size: 0.85em;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .patient-name { font-weight: 600; color: #1f2d3d; }
+        .amount { font-weight: 700; color: #007BFF; }
+        .source-badge {
+            display: inline-block; padding: 4px 10px;
+            border-radius: 6px; font-size: 0.8em; font-weight: 600;
+            background: #eef5ff; color: #007BFF;
+        }
+        .status-badge {
+            display: inline-block; padding: 5px 12px;
+            border-radius: 20px; font-size: 0.8em; font-weight: 700;
+        }
+        .status-badge.paid    { background: #d4edda; color: #155724; }
+        .status-badge.pending { background: #fff3cd; color: #856404; }
+        .date-chip {
+            display: inline-block; padding: 4px 10px;
+            border-radius: 6px; font-size: 0.83em; font-weight: 600;
+            background: #f0f2f5; color: #555;
+        }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state .empty-icon { font-size: 3em; margin-bottom: 12px; }
+        .empty-state p { font-size: 1em; font-weight: 600; color: #888; margin-bottom: 4px; }
+    </style>
+</head>
+
+<body>
+<div class="dashboard-wrapper">
+
+    <nav class="sidebar">
+        <h2 class="logo">Admin Dashboard</h2>
+        <a href="{{ url_for('admin_dashboard') }}">🏠 Dashboard</a>
+        <a href="{{ url_for('admin_appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('admin_users') }}">👥 Users</a>
+        <a href="{{ url_for('admin_create_user') }}">➕ Create Users</a>
+        <a href="{{ url_for('admin_billing') }}">💳 Billing</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <div class="billing-content">
+
+        <div class="billing-page-header">
+            <h1>💳 Billing &amp; Payments</h1>
+            <p>Overview of all patient payments across the system.</p>
+        </div>
+
+        <!-- Generate Report Button -->
+        <a href="{{ url_for('admin_billing_report') }}" class="report-btn">
+            📥 Generate Billing Report (PDF)
+        </a>
+
+        <!-- Summary Stats -->
+        <div class="billing-stats">
+            <div class="b-stat total-card">
+                <h3>Total Payments</h3>
+                <p>{{ payments | length }}</p>
+            </div>
+            <div class="b-stat paid-card">
+                <h3>Paid</h3>
+                <p>{{ payments | selectattr('status', 'equalto', 'paid') | list | length }}</p>
+            </div>
+            <div class="b-stat pending-card">
+                <h3>Pending</h3>
+                <p>{{ payments | selectattr('status', 'equalto', 'pending') | list | length }}</p>
+            </div>
+            <div class="b-stat revenue-card">
+                <h3>Revenue (KES)</h3>
+                <p>{{ "{:,.0f}".format(payments | selectattr('status', 'equalto', 'paid') | sum(attribute='amount')) }}</p>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="billing-toolbar">
+            <input type="text" id="billSearch" placeholder="🔍  Search by patient name…">
+            <select id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+            </select>
+        </div>
+
+        <!-- Table -->
+        <div class="billing-card">
+            <table class="billing-table" id="billingTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Service Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr data-status="{{ p.status }}">
+                        <td style="color:#aaa;font-size:0.85em;font-weight:600;">{{ loop.index }}</td>
+                        <td>
+                            <div class="patient-cell">
+                                <div class="avatar">{{ p.full_name[:2]|upper }}</div>
+                                <span class="patient-name">{{ p.full_name }}</span>
+                            </div>
+                        </td>
+                        <td><span class="source-badge">{{ p.source | replace('_', ' ') | title }}</span></td>
+                        <td class="amount">KES {{ p.amount }}</td>
+                        <td>
+                            {% if p.status == 'paid' %}
+                                <span class="status-badge paid">✅ Paid</span>
+                            {% else %}
+                                <span class="status-badge pending">⏳ Pending</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="date-chip">{{ p.payment_date or 'N/A' }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon">💳</div>
+                                <p>No payments found</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const searchInput  = document.getElementById('billSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const rows         = document.querySelectorAll('#billingTable tbody tr[data-status]');
+
+    function filterTable() {
+        const q      = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+        rows.forEach(row => {
+            const name  = row.querySelector('.patient-name')?.textContent.toLowerCase() || '';
+            const show  = name.includes(q) && (!status || row.dataset.status === status);
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+</script>
+</body>
+</html>

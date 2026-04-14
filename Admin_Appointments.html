@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Appointments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .appt-content {
+            flex: 1; padding: 35px 30px;
+            background: #f4f6f9; overflow-y: auto;
+        }
+        .appt-header { margin-bottom: 28px; }
+        .appt-header h1 { font-size: 1.75em; color: #1f2d3d; margin-bottom: 4px; }
+        .appt-header p  { color: #6c757d; font-size: 0.95em; }
+
+        /* Report button */
+        .report-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #28a745, #5cd65c);
+            color: white; border: none; border-radius: 10px;
+            font-size: 0.9em; font-weight: 700; cursor: pointer;
+            text-decoration: none; transition: transform 0.15s, opacity 0.2s;
+            margin-bottom: 24px;
+        }
+        .report-btn:hover { transform: scale(1.04); opacity: 0.92; }
+
+        /* Stats */
+        .appt-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px; margin-bottom: 28px;
+        }
+        .appt-stat {
+            background: white; padding: 18px 16px;
+            border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+            text-align: center; border-top: 4px solid #ccc; transition: transform 0.2s;
+        }
+        .appt-stat:hover { transform: translateY(-3px); }
+        .appt-stat.total     { border-top-color: #007BFF; }
+        .appt-stat.pending   { border-top-color: #ffc107; }
+        .appt-stat.completed { border-top-color: #28a745; }
+        .appt-stat .s-icon   { font-size: 1.6em; margin-bottom: 6px; }
+        .appt-stat h3 {
+            font-size: 0.75em; color: #888; text-transform: uppercase;
+            letter-spacing: 0.5px; font-weight: 700; margin-bottom: 6px;
+        }
+        .appt-stat p { font-size: 1.8em; font-weight: 800; color: #1f2d3d; margin: 0; }
+
+        /* Toolbar */
+        .appt-toolbar {
+            display: flex; gap: 12px; margin-bottom: 18px;
+            flex-wrap: wrap; align-items: center;
+        }
+        .appt-toolbar input,
+        .appt-toolbar select {
+            padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 0.91em; outline: none; background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .appt-toolbar input { width: 260px; }
+        .appt-toolbar input:focus,
+        .appt-toolbar select:focus {
+            border-color: #007BFF; box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+        .appt-count { margin-left: auto; font-size: 0.85em; color: #888; font-weight: 600; }
+
+        /* Table */
+        .appt-card { background: white; border-radius: 16px; box-shadow: 0 8px 28px rgba(0,0,0,0.08); overflow: hidden; }
+        .appt-table { width: 100%; border-collapse: collapse; }
+        .appt-table thead tr { background: #1f2d3d; color: white; }
+        .appt-table th {
+            padding: 14px 18px; text-align: left; font-size: 0.8em;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;
+        }
+        .appt-table td {
+            padding: 14px 18px; font-size: 0.92em; color: #333;
+            border-bottom: 1px solid #f0f2f5; vertical-align: middle;
+        }
+        .appt-table tbody tr:last-child td { border-bottom: none; }
+        .appt-table tbody tr { transition: background 0.15s; }
+        .appt-table tbody tr:hover { background: #f7faff; }
+        .patient-cell { display: flex; align-items: center; gap: 12px; }
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, #007BFF, #00c6ff);
+            color: white; font-weight: 700; font-size: 0.85em;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .patient-name { font-weight: 600; color: #1f2d3d; }
+        .specialty-badge {
+            display: inline-block; padding: 4px 11px; border-radius: 6px;
+            font-size: 0.82em; font-weight: 600; background: #eef5ff; color: #007BFF;
+        }
+        .date-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 6px; font-size: 0.83em;
+            font-weight: 600; background: #f0f4ff; color: #3a56d4;
+        }
+        .time-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 6px; font-size: 0.83em;
+            font-weight: 600; background: #fff8e6; color: #d48806;
+        }
+        .status-badge {
+            display: inline-block; padding: 5px 13px;
+            border-radius: 20px; font-size: 0.8em;
+            font-weight: 700; text-transform: capitalize;
+        }
+        .status-badge.pending   { background: #fff3cd; color: #856404; }
+        .status-badge.completed { background: #d4edda; color: #155724; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state .empty-icon { font-size: 3em; margin-bottom: 12px; }
+        .empty-state p { font-size: 1em; font-weight: 600; color: #888; margin-bottom: 4px; }
+        .empty-state small { font-size: 0.85em; color: #aaa; }
+    </style>
+</head>
+
+<body>
+<div class="dashboard-wrapper">
+
+    <nav class="sidebar">
+        <h2 class="logo">Admin Dashboard</h2>
+        <a href="{{ url_for('admin_dashboard') }}">🏠 Dashboard</a>
+        <a href="{{ url_for('admin_appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('admin_users') }}">👥 Users</a>
+        <a href="{{ url_for('admin_create_user') }}">➕ Create Users</a>
+        <a href="{{ url_for('admin_billing') }}">💳 Billing</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <div class="appt-content">
+
+        <div class="appt-header">
+            <h1>📅 All Appointments</h1>
+            <p>Overview of every appointment booked across the system.</p>
+        </div>
+
+        <!-- Generate Report Button -->
+        <a href="{{ url_for('admin_appointments_report') }}" class="report-btn">
+            📥 Generate Appointments Report (PDF)
+        </a>
+
+        <!-- Stat Cards -->
+        <div class="appt-stats">
+            <div class="appt-stat total">
+                <div class="s-icon">📋</div>
+                <h3>Total</h3>
+                <p>{{ appointments | length }}</p>
+            </div>
+            <div class="appt-stat pending">
+                <div class="s-icon">⏳</div>
+                <h3>Pending</h3>
+                <p>{{ appointments | selectattr('status', 'equalto', 'pending') | list | length }}</p>
+            </div>
+            <div class="appt-stat completed">
+                <div class="s-icon">✅</div>
+                <h3>Completed</h3>
+                <p>{{ appointments | selectattr('status', 'equalto', 'completed') | list | length }}</p>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="appt-toolbar">
+            <input type="text" id="apptSearch" placeholder="🔍  Search by patient name…">
+            <select id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+            <select id="typeFilter">
+                <option value="">All Specialties</option>
+                <option value="General Physician">General Physician</option>
+                <option value="Tooth Doctor">Tooth Doctor</option>
+                <option value="Child Doctor">Child Doctor</option>
+            </select>
+            <span class="appt-count" id="apptCount"></span>
+        </div>
+
+        <!-- Table -->
+        <div class="appt-card">
+            <table class="appt-table" id="apptTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Specialty</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr data-status="{{ appt.status }}" data-type="{{ appt.appointment_type }}">
+                        <td style="color:#bbb;font-size:0.85em;font-weight:600;">{{ loop.index }}</td>
+                        <td>
+                            <div class="patient-cell">
+                                <div class="avatar">{{ appt.patient_name[:2] | upper }}</div>
+                                <span class="patient-name">{{ appt.patient_name }}</span>
+                            </div>
+                        </td>
+                        <td><span class="specialty-badge">{{ appt.appointment_type }}</span></td>
+                        <td><span class="date-chip">📆 {{ appt.appointment_date.strftime('%d %b %Y') }}</span></td>
+                        <td><span class="time-chip">🕐 {{ appt.appointment_time }}</span></td>
+                        <td><span class="status-badge {{ appt.status }}">{{ appt.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <p>No appointments yet</p>
+                                <small>Appointments booked by patients will appear here.</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const searchInput  = document.getElementById('apptSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const typeFilter   = document.getElementById('typeFilter');
+    const countEl      = document.getElementById('apptCount');
+    const rows         = document.querySelectorAll('#apptTable tbody tr[data-status]');
+
+    function filterTable() {
+        const q      = searchInput.value.toLowerCase();
+        const status = statusFilter.value.toLowerCase();
+        const type   = typeFilter.value.toLowerCase();
+        let visible  = 0;
+
+        rows.forEach(row => {
+            const name      = row.querySelector('.patient-name')?.textContent.toLowerCase() || '';
+            const rowStatus = row.dataset.status?.toLowerCase() || '';
+            const rowType   = row.dataset.type?.toLowerCase() || '';
+            const show      = name.includes(q) &&
+                              (!status || rowStatus === status) &&
+                              (!type   || rowType   === type);
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+
+        countEl.textContent = `${visible} appointment${visible !== 1 ? 's' : ''} shown`;
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    typeFilter.addEventListener('change', filterTable);
+    filterTable();
+</script>
+</body>
+</html>

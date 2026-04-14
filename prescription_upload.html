@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .file-upload-box {
+            border: 2.5px dashed #007BFF;
+            padding: 35px 25px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            background: #f9fbff;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            position: relative;
+        }
+
+        .file-upload-box.drag-over {
+            background: #ddeeff;
+            border-color: #0056b3;
+            border-style: solid;
+        }
+
+        .file-upload-box.file-accepted {
+            background: #eafaf1;
+            border-color: #28a745;
+        }
+
+        .drop-icon {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            display: block;
+            transition: transform 0.2s;
+        }
+
+        .file-upload-box.drag-over .drop-icon {
+            transform: scale(1.2);
+        }
+
+        .drop-title {
+            font-size: 1em;
+            font-weight: 700;
+            color: #1f2d3d;
+            margin: 0 0 4px 0;
+        }
+
+        .drop-sub {
+            font-size: 0.85em;
+            color: #888;
+            margin: 4px 0 10px 0;
+        }
+
+        .file-upload-box input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 8px 22px;
+            background: linear-gradient(135deg, #007BFF, #00c6ff);
+            color: white;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.88em;
+            cursor: pointer;
+            transition: transform 0.15s, opacity 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .file-label:hover {
+            transform: scale(1.04);
+            opacity: 0.92;
+        }
+
+        .file-chosen {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 6px 14px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            max-width: 100%;
+            word-break: break-all;
+        }
+
+        #fileClear {
+            background: none;
+            border: none;
+            color: #155724;
+            font-size: 1em;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        #fileClear:hover { color: #dc3545; }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+
+    <nav class="sidebar">
+        <h2 class="logo">MyHealth</h2>
+        <a href="{{ url_for('patient_dashboard') }}">🏠 Home</a>
+        <a href="{{ url_for('appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('review_request') }}">📋 Review Request</a>
+        <a href="{{ url_for('prescription_upload') }}">📄 Prescriptions</a>
+        <a href="{{ url_for('patient_billing') }}">💳 Billing</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <div class="patient-content">
+
+        <div class="page-header">
+            <h1>📄 Upload Prescription</h1>
+            <p>Submit your prescription for pharmacist review.</p>
+        </div>
+
+        <div class="upload-card">
+
+            <form class="prescription-form" method="POST"
+                  action="{{ url_for('prescription_upload') }}"
+                  enctype="multipart/form-data">
+
+                <div class="file-upload-box" id="dropZone">
+                    <span class="drop-icon" id="dropIcon">📎</span>
+                    <p class="drop-title">Drag &amp; drop your file here</p>
+                    <p class="drop-sub">or</p>
+                    <label for="prescription" class="file-label">Browse File</label>
+                    <input type="file" id="prescription" name="prescription"
+                           accept="image/*,.pdf" required>
+                    <br>
+                    <small>Accepted: PDF, JPG, PNG</small>
+                    <div class="file-chosen" id="fileChosen" style="display:none;">
+                        <span id="fileName"></span>
+                        <button type="button" id="fileClear" title="Remove">&#x2715;</button>
+                    </div>
+                </div>
+
+                <div class="appointment-group">
+                    <label>Allergies</label>
+                    <input type="text" name="allergies" class="appointment-input"
+                           placeholder="e.g. Penicillin">
+                </div>
+
+                <div class="appointment-group">
+                    <label>Current Medications</label>
+                    <input type="text" name="medications" class="appointment-input"
+                           placeholder="e.g. Paracetamol, Insulin">
+                </div>
+
+                <button type="submit" class="upload-btn">Upload Prescription</button>
+
+            </form>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const dropZone   = document.getElementById('dropZone');
+    const fileInput  = document.getElementById('prescription');
+    const fileChosen = document.getElementById('fileChosen');
+    const fileName   = document.getElementById('fileName');
+    const fileClear  = document.getElementById('fileClear');
+    const dropIcon   = document.getElementById('dropIcon');
+
+    const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+
+    function showFile(file) {
+        if (!file) return;
+
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            alert('Invalid file type. Please upload a PDF, JPG, or PNG.');
+            fileInput.value = '';
+            return;
+        }
+
+        fileName.textContent     = file.name;
+        fileChosen.style.display = 'inline-flex';
+        dropIcon.textContent     = '✅';
+        dropZone.classList.add('file-accepted');
+        dropZone.classList.remove('drag-over');
+    }
+
+    function clearFile() {
+        fileInput.value          = '';
+        fileChosen.style.display = 'none';
+        fileName.textContent     = '';
+        dropIcon.textContent     = '📎';
+        dropZone.classList.remove('file-accepted');
+    }
+
+    /* Clear button — stop bubbling so it doesn't re-open the picker */
+    fileClear.addEventListener('click', function(e) {
+        e.stopPropagation();
+        clearFile();
+    });
+
+    /* The <label for="prescription"> already opens the file picker natively.
+       We only need the dropZone click handler for clicks OUTSIDE the label,
+       so we skip if the click originated from the label or the input itself. */
+    dropZone.addEventListener('click', function(e) {
+        if (e.target === fileClear) return;
+        // If the label or file input was clicked, the browser handles it — don't double-trigger
+        const fileLabel = dropZone.querySelector('.file-label');
+        if (e.target === fileLabel || e.target === fileInput) return;
+        fileInput.click();
+    });
+
+    /* Browse via input */
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) showFile(fileInput.files[0]);
+    });
+
+    /* Drag enter / over — highlight the zone */
+    ['dragenter', 'dragover'].forEach(evt => {
+        dropZone.addEventListener(evt, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('drag-over');
+        });
+    });
+
+    /* Drag leave / end — remove highlight */
+    ['dragleave', 'dragend'].forEach(evt => {
+        dropZone.addEventListener(evt, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+        });
+    });
+
+    /* Drop — assign file to the input */
+    dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('drag-over');
+
+        const files = e.dataTransfer.files;
+        if (!files || files.length === 0) return;
+
+        if (files.length > 1) {
+            alert('Please drop only one file at a time.');
+            return;
+        }
+
+        /* Transfer the dropped file into the real <input> so the form submits it */
+        const dt = new DataTransfer();
+        dt.items.add(files[0]);
+        fileInput.files = dt.files;
+
+        showFile(files[0]);
+    });
+</script>
+</body>
+</html>

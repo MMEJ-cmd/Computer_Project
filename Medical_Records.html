@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor – Medical Records</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* ── Page wrapper ── */
+        .records-content {
+            flex: 1;
+            padding: 35px 30px;
+            background: #f4f6f9;
+            overflow-y: auto;
+        }
+
+        /* ── Page header ── */
+        .records-page-header {
+            margin-bottom: 28px;
+        }
+
+        .records-page-header h1 {
+            font-size: 1.75em;
+            color: #1f2d3d;
+            margin-bottom: 4px;
+        }
+
+        .records-page-header p {
+            color: #6c757d;
+            font-size: 0.95em;
+        }
+
+        /* ── Search & filter bar ── */
+        .records-toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .records-toolbar input {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.93em;
+            width: 280px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .records-toolbar input:focus {
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 3px rgba(111,66,193,0.12);
+        }
+
+        .records-count {
+            margin-left: auto;
+            font-size: 0.85em;
+            color: #888;
+            font-weight: 600;
+        }
+
+        /* ── Card wrapper ── */
+        .records-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* ── Table ── */
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .records-table thead tr {
+            background: #1f2d3d;
+            color: white;
+        }
+
+        .records-table th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 0.82em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+        }
+
+        .records-table td {
+            padding: 16px 18px;
+            font-size: 0.93em;
+            color: #333;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: top;
+        }
+
+        .records-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .records-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .records-table tbody tr:hover {
+            background: #faf7ff;
+        }
+
+        /* ── Patient avatar + name ── */
+        .patient-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6f42c1, #a78bfa);
+            color: white;
+            font-weight: 700;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .patient-name {
+            font-weight: 600;
+            color: #1f2d3d;
+        }
+
+        /* ── Symptom / diagnosis pills ── */
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tag-symptom   { background: #fff3cd; color: #856404; }
+        .tag-diagnosis { background: #d4edda; color: #155724; }
+        .tag-none      { background: #f0f0f0; color: #888; font-style: italic; }
+
+        /* ── Text cells (multi-line) ── */
+        .text-cell {
+            max-width: 280px;
+            line-height: 1.55;
+            color: #444;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 70px 20px;
+            color: #aaa;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3em;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #888;
+        }
+
+        .empty-state small {
+            font-size: 0.85em;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .records-content { padding: 20px 15px; }
+            .records-table th,
+            .records-table td { padding: 10px 12px; }
+            .records-toolbar input { width: 100%; }
+            .records-count { margin-left: 0; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">Doctor Dashboard</h2>
+        <a href="{{ url_for('doctor_dashboard') }}">🏠 Home</a>
+            <a href="{{ url_for('doctor_appointments') }}">📅 Appointments</a>
+            <a href="{{ url_for('doctor_consultation') }}">🩺 Consultation</a>
+            <a href="{{ url_for('doctor_prescription') }}">📄 Prescription</a>
+            <a href="{{ url_for('doctor_medical_records') }}">🗂️ Medical Records</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="records-content">
+
+        <!-- Header -->
+        <div class="records-page-header">
+            <h1>🗂️ Patient Medical Records</h1>
+            <p>Full history of diagnoses and symptoms for your patients.</p>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="records-toolbar">
+            <input type="text" id="recordSearch" placeholder="🔍  Search by patient name…">
+            <span class="records-count" id="recordCount"></span>
+        </div>
+
+        <!-- Table Card -->
+        <div class="records-card">
+            <table class="records-table" id="recordsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Symptoms</th>
+                        <th>Diagnosis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <!-- Row number -->
+                        <td style="color:#aaa; font-size:0.85em; font-weight:600;">
+                            {{ loop.index }}
+                        </td>
+
+                        <!-- Patient -->
+                        <td>
+                            <div class="patient-cell">
+                                <div class="avatar">
+                                    {{ record.patient_name[:2]|upper }}
+                                </div>
+                                <span class="patient-name">{{ record.patient_name }}</span>
+                            </div>
+                        </td>
+
+                        <!-- Symptoms -->
+                        <td class="text-cell">
+                            {% if record.symptoms and record.symptoms != 'None' %}
+                                <div class="tag-list">
+                                    {% for s in record.symptoms.split(',') %}
+                                        <span class="tag tag-symptom">{{ s.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="tag tag-none">None recorded</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Diagnosis -->
+                        <td class="text-cell">
+                            {% if record.diagnosis and record.diagnosis != 'None' %}
+                                <div class="tag-list">
+                                    {% for d in record.diagnosis.split(',') %}
+                                        <span class="tag tag-diagnosis">{{ d.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="tag tag-none">None recorded</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <div class="empty-icon">🗂️</div>
+                                <p>No records found</p>
+                                <small>Patient medical records will appear here after consultations.</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div><!-- end records-content -->
+</div><!-- end dashboard-wrapper -->
+
+<script>
+    const searchInput  = document.getElementById('recordSearch');
+    const countEl      = document.getElementById('recordCount');
+    const rows         = document.querySelectorAll('#recordsTable tbody tr');
+
+    function updateCount(visible) {
+        countEl.textContent = `${visible} record${visible !== 1 ? 's' : ''} found`;
+    }
+
+    // Initial count
+    updateCount(rows.length);
+
+    searchInput.addEventListener('input', function () {
+        const q = this.value.toLowerCase();
+        let visible = 0;
+        rows.forEach(row => {
+            const name = row.querySelector('.patient-name');
+            const show = !name || name.textContent.toLowerCase().includes(q);
+            row.style.display = show ? '' : 'none';
+            if (show && name) visible++;
+        });
+        updateCount(visible);
+    });
+</script>
+</body>
+</html>

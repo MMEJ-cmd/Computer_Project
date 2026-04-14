@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">MyHealth</h2>
+
+        <a href="{{ url_for('patient_dashboard') }}">🏠 Home</a>
+        <a href="{{ url_for('appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('review_request') }}">📋 Review Requests</a>
+        <a href="{{ url_for('prescription_upload') }}">📄 Prescriptions</a>
+        <a href="{{ url_for('patient_billing') }}">💳 Billing</a>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="patient-content">
+
+        <!-- Welcome Section -->
+        <div class="welcome-card">
+            <h1>Welcome back 👋</h1>
+            <p>Manage your health services easily from your dashboard.</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card-grid">
+
+            <div class="dashboard-card">
+                <h3>📅 Book Appointment</h3>
+                <p>Schedule a visit with a doctor.</p>
+                <a href="{{ url_for('appointments') }}" class="card-btn">Book Now</a>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>📄 Upload Prescription</h3>
+                <p>Upload your prescription for processing.</p>
+                <a href="{{ url_for('prescription_upload') }}" class="card-btn">Upload</a>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>📋 Track Requests</h3>
+                <p>Check your review & prescription status.</p>
+                <a href="{{ url_for('review_request') }}" class="card-btn">View</a>
+            </div>
+
+            <div class="dashboard-card">
+                <h3>💳 Billing</h3>
+                <p>View and manage your payments.</p>
+                <a href="{{ url_for('patient_billing') }}" class="card-btn">Open</a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-links">
+            <a href="pharmacist_dashboard.html" class="nav-home">Dashboard</a>
+            <a href="/logout" class="nav-logout">Logout</a>
+        </div>
+    </nav>
+    <div class="pharmacist-container">
+        <h2>Request Detail</h2>
+        <p><strong>Patient Name:</strong> John Doe</p>
+        <p><strong>Service Type:</strong> Prescription Upload</p>
+        <p><strong>Symptoms / Notes:</strong> Fever and headache</p>
+        <p><strong>Allergies:</strong> None</p>
+        <p><strong>Current Medications:</strong> None</p>
+        <p><strong>Prescription Photo:</strong> <a href="#">View</a></p>
+
+        <form class="pharmacist-form" method="POST" action="/update_status">
+            <label for="status">Update Status:</label>
+            <select id="status" name="status" required>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Ready for Pickup">Ready for Pickup</option>
+                <option value="Completed">Completed</option>
+                <option value="Referred">Referred</option>
+            </select>
+
+            <label for="note">Optional Note:</label>
+            <textarea id="note" name="note" rows="3" placeholder="Optional note for patient"></textarea>
+
+            <button type="submit">Update Status</button>
+        </form>
+        <a href="pharmacist_dashboard.html" class="pharmacist-btn back">Back to Dashboard</a>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Service Request</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="patient-container">
+        <h2>Submit Request</h2>
+        <form class="patient-form" method="POST" action="/submit_request" enctype="multipart/form-data">
+
+            <label for="service_type">Select Service Type:</label>
+            <select id="service_type" name="service_type" required>
+                <option value="">--Select--</option>
+                <option value="advice_request">Advice Request / Minor Ailment</option>
+                <option value="prescription_upload">Prescription Upload</option>
+                <option value="symptom_assessment">Symptom Assessment</option>
+            </select>
+
+            <label for="symptoms">Symptoms / Notes:</label>
+            <textarea id="symptoms" name="symptoms" rows="4" placeholder="Describe your symptoms or request"></textarea>
+
+            <label for="prescription_photo">Prescription Photo (if any):</label>
+            <input type="file" id="prescription_photo" name="prescription_photo" accept="image/*">
+
+            <label for="allergies">Allergies:</label>
+            <input type="text" id="allergies" name="allergies" placeholder="List allergies">
+
+            <label for="current_medications">Current Medications:</label>
+            <input type="text" id="current_medications" name="current_medications"
+                placeholder="List current medications">
+
+            <button type="submit">Submit Request</button>
+        </form>
+        <a href="patient_dashboard.html" class="patient-btn back">Back to Dashboard</a>
+    </div>
+</body>
+
+</html>

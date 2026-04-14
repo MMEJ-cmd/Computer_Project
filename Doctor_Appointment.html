@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor – Appointments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* ── Page wrapper ── */
+        .appt-content {
+            flex: 1;
+            padding: 35px 30px;
+            background: #f4f6f9;
+            overflow-y: auto;
+        }
+
+        /* ── Page header ── */
+        .appt-page-header {
+            margin-bottom: 28px;
+        }
+
+        .appt-page-header h1 {
+            font-size: 1.75em;
+            color: #1f2d3d;
+            margin-bottom: 4px;
+        }
+
+        .appt-page-header p {
+            color: #6c757d;
+            font-size: 0.95em;
+        }
+
+        /* ── Specialty badge ── */
+        .specialty-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #007BFF, #00c6ff);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* ── Search bar ── */
+        .appt-search-wrap {
+            margin-bottom: 20px;
+        }
+
+        .appt-search-wrap input {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.93em;
+            width: 280px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .appt-search-wrap input:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.12);
+        }
+
+        /* ── Card wrapper ── */
+        .appt-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* ── Table ── */
+        .appt-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .appt-table thead tr {
+            background: #1f2d3d;
+            color: white;
+        }
+
+        .appt-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.82em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
+        }
+
+        .appt-table td {
+            padding: 14px 16px;
+            font-size: 0.93em;
+            color: #333;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: middle;
+        }
+
+        .appt-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .appt-table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .appt-table tbody tr:hover {
+            background: #f7faff;
+        }
+
+        /* ── Avatar initials ── */
+        .patient-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007BFF, #00c6ff);
+            color: white;
+            font-weight: 700;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .patient-name {
+            font-weight: 600;
+            color: #1f2d3d;
+        }
+
+        /* ── Date / Time chips ── */
+        .date-chip, .time-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.84em;
+            font-weight: 600;
+        }
+
+        .date-chip {
+            background: #eef5ff;
+            color: #007BFF;
+        }
+
+        .time-chip {
+            background: #fff8e6;
+            color: #d48806;
+        }
+
+        /* ── Status badges ── */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+
+        .status-badge.pending   { background: #fff3cd; color: #856404; }
+        .status-badge.completed { background: #d4edda; color: #155724; }
+
+        /* ── Status select ── */
+        .appt-status-select {
+            padding: 7px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.88em;
+            background: #f9f9f9;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .appt-status-select:focus {
+            border-color: #007BFF;
+        }
+
+        /* ── Update button ── */
+        .appt-update-btn {
+            padding: 7px 16px;
+            background: linear-gradient(135deg, #007BFF, #00c6ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        .appt-update-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.92;
+        }
+
+        .appt-update-btn.saving {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ── Toast notification ── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.92em;
+            color: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 9999;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: #28a745; }
+        .toast.error   { background: #dc3545; }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3em;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #888;
+        }
+
+        .empty-state small {
+            font-size: 0.85em;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .appt-content { padding: 20px 15px; }
+            .appt-table th, .appt-table td { padding: 10px 12px; }
+            .appt-search-wrap input { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">Doctor Dashboard</h2>
+        <a href="{{ url_for('doctor_dashboard') }}">🏠 Home</a>
+            <a href="{{ url_for('doctor_appointments') }}">📅 Appointments</a>
+            <a href="{{ url_for('doctor_consultation') }}">🩺 Consultation</a>
+            <a href="{{ url_for('doctor_prescription') }}">📄 Prescription</a>
+            <a href="{{ url_for('doctor_medical_records') }}">🗂️ Medical Records</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="appt-content">
+
+        <!-- Header -->
+        <div class="appt-page-header">
+            <h1>
+                📅 Patient Appointments
+                <span class="specialty-badge">{{ specialty }}</span>
+            </h1>
+            <p>Review and update the status of your scheduled appointments.</p>
+        </div>
+
+        <!-- Search -->
+        <div class="appt-search-wrap">
+            <input type="text" id="apptSearch" placeholder="🔍  Search by patient name…">
+        </div>
+
+        <!-- Table Card -->
+        <div class="appt-card">
+            <table class="appt-table" id="apptTable">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Appointment Type</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Current Status</th>
+                        <th>Update Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in appointments %}
+                    <tr>
+                        <!-- Patient -->
+                        <td>
+                            <div class="patient-cell">
+                                <div class="avatar">
+                                    {{ a.patient_name[:2]|upper }}
+                                </div>
+                                <span class="patient-name">{{ a.patient_name }}</span>
+                            </div>
+                        </td>
+
+                        <!-- Type -->
+                        <td>{{ a.appointment_type }}</td>
+
+                        <!-- Date -->
+                        <td>
+                            <span class="date-chip">📆 {{ a.appointment_date }}</span>
+                        </td>
+
+                        <!-- Time -->
+                        <td>
+                            <span class="time-chip">🕐 {{ a.appointment_time }}</span>
+                        </td>
+
+                        <!-- Current status badge -->
+                        <td>
+                            <span class="status-badge {{ a.status }}">{{ a.status }}</span>
+                        </td>
+
+                        <!-- Dropdown -->
+                        <td>
+                            <select class="appt-status-select" data-appointment-id="{{ a.appointment_id }}">
+                                <option value="pending"   {% if a.status=='pending'   %}selected{% endif %}>Pending</option>
+                                <option value="completed" {% if a.status=='completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </td>
+
+                        <!-- Update button -->
+                        <td>
+                            <button class="appt-update-btn" data-appointment-id="{{ a.appointment_id }}">
+                                Save
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <p>No appointments yet</p>
+                                <small>Appointments booked by patients will appear here.</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div><!-- end appt-content -->
+</div><!-- end dashboard-wrapper -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Live search ──
+document.getElementById('apptSearch').addEventListener('input', function () {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('#apptTable tbody tr').forEach(row => {
+        const name = row.querySelector('.patient-name');
+        row.style.display = (!name || name.textContent.toLowerCase().includes(q)) ? '' : 'none';
+    });
+});
+
+// ── Toast helper ──
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+// ── Update appointment status ──
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.appt-update-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const apptId = button.dataset.appointmentId;
+            const select = document.querySelector(`.appt-status-select[data-appointment-id='${apptId}']`);
+            const status = select.value;
+
+            button.textContent = 'Saving…';
+            button.classList.add('saving');
+            button.disabled = true;
+
+            fetch("{{ url_for('doctor_update_appointment_status') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `appointment_id=${apptId}&status=${status}`
+            })
+            .then(r => r.text())
+            .then(data => {
+                if (data === 'success') {
+                    // Update the visible badge in the row
+                    const row = button.closest('tr');
+                    const badge = row.querySelector('.status-badge');
+                    badge.className = `status-badge ${status}`;
+                    badge.textContent = status;
+                    showToast(`Status updated to "${status}" ✔`, 'success');
+                } else {
+                    showToast('Failed to update status.', 'error');
+                }
+            })
+            .catch(() => showToast('Network error. Try again.', 'error'))
+            .finally(() => {
+                button.textContent = 'Save';
+                button.classList.remove('saving');
+                button.disabled = false;
+            });
+        });
+    });
+});
+</script>
+</body>
+</html>

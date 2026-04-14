@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Request Status</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">MyHealth</h2>
+
+        <a href="{{ url_for('patient_dashboard') }}">🏠 Home</a>
+        <a href="{{ url_for('appointments') }}">📅 Appointments</a>
+        <a href="{{ url_for('review_request') }}">📋 Review Request</a>
+        <a href="{{ url_for('prescription_upload') }}">📄 Prescriptions</a>
+        <a href="{{ url_for('patient_billing') }}">💳 Billing</a>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="patient-content">
+
+        <!-- Header -->
+        <div class="page-header">
+            <h1>📋 My Requests</h1>
+            <p>Track the status of your consultations and reviews.</p>
+        </div>
+
+        <!-- Card -->
+        <div class="review-card">
+
+            {% if requests %}
+            <table class="review-table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr>
+                        <td>{{ req.type }}</td>
+                        <td class="desc-cell">{{ req.description }}</td>
+                        <td>
+                            <span class="status-badge {{ req.status }}">
+                                {{ req.status|capitalize }}
+                            </span>
+                        </td>
+                        <td>{{ req.date.strftime('%d %b %Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <div class="empty-state">
+                    <p>📭 No requests yet</p>
+                    <small>Your submitted requests will appear here.</small>
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+</body>
+
+</html>

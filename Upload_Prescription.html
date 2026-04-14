@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacist – Patient Prescriptions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+
+        .rx-content {
+            flex: 1;
+            padding: 35px 30px;
+            background: #f4f6f9;
+            overflow-y: auto;
+        }
+
+        .rx-header { margin-bottom: 28px; }
+        .rx-header h1 { font-size: 1.75em; color: #1f2d3d; margin-bottom: 4px; }
+        .rx-header p  { color: #6c757d; font-size: 0.95em; }
+
+        /* ── Stat cards ── */
+        .rx-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .rx-stat {
+            background: white;
+            padding: 18px 16px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+            text-align: center;
+            border-top: 4px solid #ccc;
+            transition: transform 0.2s;
+        }
+
+        .rx-stat:hover      { transform: translateY(-3px); }
+        .rx-stat.total      { border-top-color: #007BFF; }
+        .rx-stat.pending    { border-top-color: #ffc107; }
+        .rx-stat.ready      { border-top-color: #17a2b8; }
+        .rx-stat.completed  { border-top-color: #28a745; }
+        .rx-stat .s-icon    { font-size: 1.6em; margin-bottom: 6px; }
+
+        .rx-stat h3 {
+            font-size: 0.75em; color: #888;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            font-weight: 700; margin-bottom: 6px;
+        }
+
+        .rx-stat p { font-size: 1.8em; font-weight: 800; color: #1f2d3d; margin: 0; }
+
+        /* ── Toolbar ── */
+        .rx-toolbar {
+            display: flex; gap: 12px;
+            margin-bottom: 18px; flex-wrap: wrap; align-items: center;
+        }
+
+        .rx-toolbar input,
+        .rx-toolbar select {
+            padding: 10px 14px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 0.91em;
+            outline: none; background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .rx-toolbar input { width: 260px; }
+
+        .rx-toolbar input:focus,
+        .rx-toolbar select:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .rx-count { margin-left: auto; font-size: 0.85em; color: #888; font-weight: 600; }
+
+        /* ── Table card ── */
+        .rx-card {
+            background: white; border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.08); overflow: hidden;
+        }
+
+        .rx-table { width: 100%; border-collapse: collapse; }
+
+        .rx-table thead tr { background: #1f2d3d; color: white; }
+
+        .rx-table th {
+            padding: 14px 18px; text-align: left;
+            font-size: 0.8em; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap;
+        }
+
+        .rx-table td {
+            padding: 14px 18px; font-size: 0.92em;
+            color: #333; border-bottom: 1px solid #f0f2f5; vertical-align: middle;
+        }
+
+        .rx-table tbody tr:last-child td { border-bottom: none; }
+        .rx-table tbody tr { transition: background 0.15s; }
+        .rx-table tbody tr:hover { background: #f7faff; }
+
+        /* ── Patient cell ── */
+        .patient-cell { display: flex; align-items: center; gap: 12px; }
+
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, #007BFF, #00c6ff);
+            color: white; font-weight: 700; font-size: 0.85em;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+
+        .patient-name { font-weight: 600; color: #1f2d3d; }
+
+        /* ── Date chip ── */
+        .date-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 0.83em; font-weight: 600;
+            background: #f0f4ff; color: #3a56d4;
+        }
+
+        /* ── Download button ── */
+        .dl-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #28a745, #5cd65c);
+            color: white; border-radius: 8px;
+            font-size: 0.82em; font-weight: 700;
+            text-decoration: none; transition: transform 0.15s, opacity 0.2s;
+        }
+
+        .dl-btn:hover { transform: scale(1.05); opacity: 0.92; }
+
+        /* ── Status select ── */
+        .rx-status-select {
+            padding: 7px 10px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 0.88em;
+            background: #f9f9f9; cursor: pointer; outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .rx-status-select:focus { border-color: #007BFF; }
+
+        /* ── Status badges ── */
+        .status-badge {
+            display: inline-block; padding: 5px 13px;
+            border-radius: 20px; font-size: 0.8em;
+            font-weight: 700; text-transform: capitalize;
+        }
+
+        .status-badge.pending   { background: #fff3cd; color: #856404; }
+        .status-badge.ready     { background: #d1ecf1; color: #0c5460; }
+        .status-badge.completed { background: #d4edda; color: #155724; }
+
+        /* ── Save button ── */
+        .rx-save-btn {
+            padding: 7px 16px;
+            background: linear-gradient(135deg, #007BFF, #00c6ff);
+            color: white; border: none; border-radius: 8px;
+            font-size: 0.84em; font-weight: 700;
+            cursor: pointer; transition: transform 0.15s, opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        .rx-save-btn:hover    { transform: scale(1.05); opacity: 0.9; }
+        .rx-save-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px;
+            padding: 13px 22px; border-radius: 10px;
+            font-weight: 600; font-size: 0.91em; color: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transform: translateY(80px); opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 9999;
+        }
+
+        .toast.show    { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #28a745; }
+        .toast.error   { background: #dc3545; }
+
+        /* ── Empty state ── */
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state .empty-icon { font-size: 3em; margin-bottom: 12px; }
+        .empty-state p     { font-size: 1em; font-weight: 600; color: #888; margin-bottom: 4px; }
+        .empty-state small { font-size: 0.85em; color: #aaa; }
+
+        @media (max-width: 768px) {
+            .rx-content { padding: 20px 15px; }
+            .rx-toolbar input { width: 100%; }
+            .rx-count { margin-left: 0; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard-wrapper">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h2 class="logo">Pharmacist Dashboard</h2>
+        <a href="{{ url_for('pharmacist_dashboard') }}">🏠 Dashboard</a>
+        <a href="{{ url_for('upload_prescription') }}">📄 Patient Prescriptions</a>
+        <a href="{{ url_for('uploaded_doctor') }}">👨‍⚕️ Doctor Prescriptions</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="rx-content">
+
+        <div class="rx-header">
+            <h1>📄 Patient Prescriptions</h1>
+            <p>Review and update the status of prescriptions uploaded by patients.</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="rx-stats">
+            <div class="rx-stat total">
+                <div class="s-icon">📋</div>
+                <h3>Total</h3>
+                <p>{{ prescriptions | length }}</p>
+            </div>
+            <div class="rx-stat pending">
+                <div class="s-icon">⏳</div>
+                <h3>Pending</h3>
+                <p>{{ prescriptions | selectattr('status', 'equalto', 'pending') | list | length }}</p>
+            </div>
+            <div class="rx-stat ready">
+                <div class="s-icon">📦</div>
+                <h3>Ready</h3>
+                <p>{{ prescriptions | selectattr('status', 'equalto', 'ready') | list | length }}</p>
+            </div>
+            <div class="rx-stat completed">
+                <div class="s-icon">✅</div>
+                <h3>Completed</h3>
+                <p>{{ prescriptions | selectattr('status', 'equalto', 'completed') | list | length }}</p>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="rx-toolbar">
+            <input type="text" id="rxSearch" placeholder="🔍  Search by patient name…">
+            <select id="rxStatusFilter">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="ready">Ready</option>
+                <option value="completed">Completed</option>
+            </select>
+            <span class="rx-count" id="rxCount"></span>
+        </div>
+
+        <!-- Table -->
+        <div class="rx-card">
+            <table class="rx-table" id="rxTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Uploaded On</th>
+                        <th>File</th>
+                        <th>Current Status</th>
+                        <th>Update Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in prescriptions %}
+                    <tr data-status="{{ p.status }}">
+
+                        <td style="color:#bbb;font-size:0.85em;font-weight:600;">{{ loop.index }}</td>
+
+                        <td>
+                            <div class="patient-cell">
+                                <div class="avatar">{{ p.patient_name[:2] | upper }}</div>
+                                <span class="patient-name">{{ p.patient_name }}</span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="date-chip">
+                                📆 {{ p.upload_date.strftime("%d %b %Y, %H:%M") }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <a class="dl-btn" href="{{ url_for('download_file', filename=p.file_name) }}">
+                                ⬇ Download
+                            </a>
+                        </td>
+
+                        <td>
+                            <span class="status-badge {{ p.status }}" id="badge-{{ p.upload_id }}">
+                                {{ p.status }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <select class="rx-status-select" data-upload-id="{{ p.upload_id }}">
+                                <option value="pending"   {% if p.status=='pending'   %}selected{% endif %}>Pending</option>
+                                <option value="ready"     {% if p.status=='ready'     %}selected{% endif %}>Ready</option>
+                                <option value="completed" {% if p.status=='completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <button class="rx-save-btn" data-upload-id="{{ p.upload_id }}">Save</button>
+                        </td>
+
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-icon">📭</div>
+                                <p>No prescriptions uploaded yet</p>
+                                <small>Patient uploads will appear here.</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `toast ${type} show`;
+        setTimeout(() => { t.className = 'toast'; }, 3200);
+    }
+
+    const searchInput  = document.getElementById('rxSearch');
+    const statusFilter = document.getElementById('rxStatusFilter');
+    const countEl      = document.getElementById('rxCount');
+    const allRows      = document.querySelectorAll('#rxTable tbody tr[data-status]');
+
+    function filterTable() {
+        const q      = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+        let visible  = 0;
+
+        allRows.forEach(row => {
+            const name = row.querySelector('.patient-name')?.textContent.toLowerCase() || '';
+            const show = name.includes(q) && (!status || row.dataset.status === status);
+            row.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+
+        countEl.textContent = `${visible} prescription${visible !== 1 ? 's' : ''} shown`;
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+    filterTable();
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.rx-save-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const uploadId = button.dataset.uploadId;
+                const select   = document.querySelector(`.rx-status-select[data-upload-id='${uploadId}']`);
+                const status   = select.value;
+
+                button.textContent = 'Saving…';
+                button.disabled    = true;
+
+                fetch("/pharmacy/update_patient_status", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `upload_id=${encodeURIComponent(uploadId)}&status=${encodeURIComponent(status)}`
+                })
+                .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+                .then(data => {
+                    if (data === 'success') {
+                        const badge = document.getElementById(`badge-${uploadId}`);
+                        badge.className   = `status-badge ${status}`;
+                        badge.textContent = status;
+                        button.closest('tr').dataset.status = status;
+                        showToast(`Status updated to "${status}" ✔`, 'success');
+                        filterTable();
+                    } else {
+                        showToast('Failed to update status.', 'error');
+                    }
+                })
+                .catch(() => showToast('Network error. Try again.', 'error'))
+                .finally(() => {
+                    button.textContent = 'Save';
+                    button.disabled    = false;
+                });
+            });
+        });
+    });
+</script>
+</body>
+</html>
